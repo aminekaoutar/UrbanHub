@@ -117,9 +117,16 @@ def sensor_hours_key(sensor_id: int, start: datetime, end: datetime) -> str:
 
 
 def select_sensors(locations: list[dict], city: str, since: datetime) -> list[dict]:
-    """Garde les capteurs utiles : polluant du contrat, station dans la ville, actifs depuis `since`."""
+    """Garde les capteurs utiles : station officielle et fixe, dans la ville, active depuis `since`,
+    polluant du contrat.
+
+    Les capteurs bon marché (AirGradient, HabitatMap...) ont isMonitor = False : on les écarte,
+    car ils sont moins fiables que les stations de référence (décision du 2026-11-19).
+    """
     selected = []
     for loc in locations:
+        if not loc.get("isMonitor") or loc.get("isMobile"):
+            continue
         coords = loc.get("coordinates") or {}
         if assign_city(coords.get("latitude"), coords.get("longitude")) != city:
             continue

@@ -12,9 +12,12 @@ from pipelines.iot_openaq.collector import (
 UTC = timezone.utc
 
 
-def _location(loc_id, lat, lon, last="2026-11-18T10:00:00Z", params=("pm25", "no2")):
+def _location(loc_id, lat, lon, last="2026-11-18T10:00:00Z", params=("pm25", "no2"),
+              is_monitor=True, is_mobile=False):
     return {
         "id": loc_id,
+        "isMonitor": is_monitor,
+        "isMobile": is_mobile,
         "name": f"station {loc_id}",
         "coordinates": {"latitude": lat, "longitude": lon},
         "datetimeLast": {"utc": last},
@@ -50,6 +53,15 @@ def test_select_sensors_drops_stations_outside_city():
 def test_select_sensors_drops_stations_inactive_since_2024():
     locs = [_location(1, 48.86, 2.35, last="2021-05-01T00:00:00Z")]
     assert select_sensors(locs, "paris", SINCE) == []
+
+
+def test_select_sensors_drops_low_cost_and_mobile_sensors():
+    locs = [
+        _location(1, 48.86, 2.35),
+        _location(2, 48.86, 2.35, is_monitor=False),  # AirGradient, HabitatMap...
+        _location(3, 48.86, 2.35, is_mobile=True),
+    ]
+    assert {s["location_id"] for s in select_sensors(locs, "paris", SINCE)} == {1}
 
 
 def test_month_chunks_cover_period_without_gap():

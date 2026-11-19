@@ -23,3 +23,4 @@ Propositions par défaut du guide (section 8). Remplacer « à valider » par la
 | 2026-11-19 | Structure initiale du dépôt créée (dossiers, `.gitignore`, `.env.example`, `requirements.txt`, `CLAUDE.md`) | Dev 1 |
 | 2026-11-19 | Villes réduites à paris, lyon, lille | Dev 3 (à valider par Dev 1 et Dev 2 dans la PR) |
 | 2026-11-19 | Période étudiée : 2024, 2025, 2026 (toutes sources) | Dev 3 (à valider par Dev 1 et Dev 2 dans la PR) |
+| 2026-11-19 | OpenAQ : seules les stations officielles fixes sont gardées (`isMonitor = true`, réseau EEA) ; capteurs bon marché (AirGradient, HabitatMap) écartés | Dev 3 |
