@@ -3,8 +3,8 @@
 Trois commandes :
 
     python -m pipelines.iot_openaq.collector discover   # liste les capteurs de chaque ville
-    python -m pipelines.iot_openaq.collector backfill   # historique 2024 → aujourd'hui
-    python -m pipelines.iot_openaq.collector live       # boucle : dernières heures, toutes les 15 min
+    python -m pipelines.iot_openaq.collector backfill   # historique 2024 → fin du mois précédent
+    python -m pipelines.iot_openaq.collector live       # rattrape le mois en cours, puis relit le jour toutes les 15 min
     python -m pipelines.iot_openaq.collector live --once
 
 Ce qui est écrit dans la couche raw (JSON de l'API tel quel, compressé gzip) :
@@ -220,8 +220,28 @@ def live_once(client: OpenAQClient, sensors: dict[str, list[dict]]):
     log.info("passage live terminé (%d capteurs)", sum(map(len, sensors.values())))
 
 
+def catch_up_month(client: OpenAQClient, sensors: dict[str, list[dict]]):
+    """Rattrapage : du 1er du mois à aujourd'hui 0 h (le backfill s'arrête au mois précédent).
+
+    Un fichier par capteur ; si le live est relancé un autre jour, le nouveau fichier recouvre
+    l'ancien et l'étape clean garde la version la plus récente de chaque heure.
+    """
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    start = today.replace(day=1)
+    if start == today:
+        return
+    all_sensors = [s for lst in sensors.values() for s in lst]
+    for i, s in enumerate(all_sensors, 1):
+        if _stop:
+            return
+        fetch_sensor_hours(client, s["sensor_id"], start, today)
+        if i % 20 == 0 or i == len(all_sensors):
+            log.info("rattrapage %s → %s : %d/%d capteurs", start.date(), today.date(), i, len(all_sensors))
+
+
 def live(client: OpenAQClient, since: datetime, once: bool):
     sensors, discovered_on = discover(client, since), date.today()
+    catch_up_month(client, sensors)
     while not _stop:
         t0 = time.monotonic()
         if date.today() != discovered_on:  # nouvelle liste de stations chaque jour
