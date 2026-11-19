@@ -24,6 +24,10 @@ Les décisions d'équipe sont dans [`docs/decisions.md`](docs/decisions.md).
 2. Copier `.env.example` en `.env`.
 3. *(à venir)* `docker compose -f infra/docker-compose.yml up -d`
 
+## Avancement
+
+- **Développeur 2 (CityBikes)** : collecteur, clean, curated, notebook Partie 2 → [`docs/dev2_citybikes.md`](docs/dev2_citybikes.md)
+
 ## Règles Git
 
 - On ne pousse jamais directement sur `main` : une branche par tâche
