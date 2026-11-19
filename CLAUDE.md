@@ -40,8 +40,8 @@ PostgreSQL 16 (serving) · Superset · Docker Compose · Jupyter, pandas, scikit
 
 - `timestamp` : UTC, type timestamp Spark (jamais une chaîne), nom exact `timestamp`.
 - `latitude` / `longitude` : double, WGS84.
-- `city` : minuscules sans accents, parmi paris, lyon, marseille, toulouse, nice, nantes,
-  strasbourg, montpellier, bordeaux, lille ; affectée par `common.cities.assign_city(lat, lon)`
+- `city` : minuscules sans accents, parmi paris, lyon, lille (période étudiée : 2024 → 2026) ;
+  affectée par `common.cities.assign_city(lat, lon)`
   (ville la plus proche à moins de 30 km, sinon null).
 - `source` : `noaa` | `citybikes` | `openaq`. `ingestion_time` : UTC, ajouté par le collecteur.
 - Colonnes en snake_case, en anglais. Valeurs manquantes = null (aucune sentinelle 9999).
