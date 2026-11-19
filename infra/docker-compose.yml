@@ -1,0 +1,162 @@
+# UrbanHub : toute l'infrastructure en une commande.
+#
+# Lancer (depuis la racine du projet) :
+#   docker compose -f infra/docker-compose.yml --env-file .env up -d --build
+# Arrêter :
+#   docker compose -f infra/docker-compose.yml --env-file .env down
+#
+# Les ports sont ouverts uniquement sur ce PC (127.0.0.1), pas sur le réseau.
+#   MinIO (console web) ...... http://localhost:9001
+#   Spark master (UI) ........ http://localhost:8080
+#   Spark worker (UI) ........ http://localhost:8081
+#   Jupyter Lab .............. http://localhost:8888
+#   Superset ................. http://localhost:8088
+#   PostgreSQL ............... localhost:5432
+#
+# Les valeurs après ":-" sont utilisées si la variable n'est pas définie dans .env.
+
+name: urbanhub
+
+# Image Spark commune (construite une fois à partir de infra/spark/Dockerfile)
+x-spark-image: &spark-image
+  image: urbanhub-spark:3.5.9
+  build: ./spark
+
+# Variables communes aux conteneurs Spark et Jupyter
+x-spark-env: &spark-env
+  AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-urbanhub}
+  AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-urbanhub123}
+  MINIO_ENDPOINT: http://minio:9000
+  MINIO_ROOT_USER: ${MINIO_ROOT_USER:-urbanhub}
+  MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-urbanhub123}
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: ${POSTGRES_DB:-urbanhub}
+  POSTGRES_USER: ${POSTGRES_USER:-urbanhub}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-urbanhub123}
+  SPARK_MASTER_URL: spark://spark-master:7077
+  TZ: UTC
+
+services:
+
+  # ---------- Data Lake : stockage objet compatible S3 ----------
+  minio:
+    image: bitnamilegacy/minio:2025.4.22-debian-12-r2   # version avec console web complète
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-urbanhub}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-urbanhub123}
+      MINIO_DEFAULT_BUCKETS: raw,clean,curated   # les 3 couches, créées au démarrage
+    ports:
+      - "127.0.0.1:9000:9000"   # API S3 (utilisée par les scripts Python)
+      - "127.0.0.1:9001:9001"   # console web
+    volumes:
+      - minio-data:/bitnami/minio/data
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ---------- Base de données de "serving" (tables curated + base interne Superset) ----------
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-urbanhub}
+      POSTGRES_USER: ${POSTGRES_USER:-urbanhub}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-urbanhub123}
+      TZ: UTC
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-urbanhub} -d ${POSTGRES_DB:-urbanhub}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ---------- Spark : le "chef" qui distribue le travail ----------
+  spark-master:
+    <<: *spark-image
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    hostname: spark-master
+    environment:
+      <<: *spark-env
+    ports:
+      - "127.0.0.1:8080:8080"   # interface web du master
+      - "127.0.0.1:7077:7077"   # adresse du cluster
+    restart: unless-stopped
+
+  # ---------- Spark : l'"ouvrier" qui exécute les calculs ----------
+  spark-worker:
+    <<: *spark-image
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    hostname: spark-worker
+    environment:
+      <<: *spark-env
+      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-2}
+      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-2g}
+    ports:
+      - "127.0.0.1:8081:8081"   # interface web du worker
+    depends_on:
+      - spark-master
+    restart: unless-stopped
+
+  # ---------- Jupyter : notebooks d'analyse + lancement des jobs Spark ----------
+  # Le dossier du projet est monté dans /app : les fichiers modifiés sur le PC
+  # sont visibles immédiatement dans le conteneur (et inversement).
+  jupyter:
+    <<: *spark-image
+    command: >
+      jupyter lab --ip=0.0.0.0 --port=8888 --no-browser
+      --ServerApp.token='' --ServerApp.password='' --ServerApp.root_dir=/app
+    hostname: jupyter          # nom utilisé par les workers pour joindre ce "driver" Spark
+    working_dir: /app
+    environment:
+      <<: *spark-env
+    ports:
+      - "127.0.0.1:8888:8888"
+      - "127.0.0.1:4040:4040"   # interface web d'un job Spark en cours
+    volumes:
+      - ..:/app
+    depends_on:
+      minio:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      spark-master:
+        condition: service_started
+    restart: unless-stopped
+
+  # ---------- Superset : le dashboard ----------
+  superset:
+    image: urbanhub-superset:5.0.0
+    build: ./superset
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-change-me-local-only}
+      POSTGRES_USER: ${POSTGRES_USER:-urbanhub}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-urbanhub123}
+      ADMIN_USER: ${SUPERSET_ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-admin}
+    # Au démarrage : mise à jour de la base interne, création du compte admin, puis serveur web
+    command: >
+      sh -c "superset db upgrade &&
+      (superset fab create-admin --username $$ADMIN_USER --password $$ADMIN_PASSWORD
+      --firstname Admin --lastname UrbanHub --email admin@urbanhub.local || true) &&
+      superset init &&
+      /app/docker/entrypoints/run-server.sh"
+    ports:
+      - "127.0.0.1:8088:8088"
+    volumes:
+      - ./superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  minio-data:
+  postgres-data:

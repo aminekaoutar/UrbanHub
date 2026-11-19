@@ -18,11 +18,36 @@ Les décisions d'équipe sont dans [`docs/decisions.md`](docs/decisions.md).
 
 ## Démarrage rapide
 
-> En construction : les commandes de lancement seront ajoutées avec `infra/docker-compose.yml`.
+Prérequis : Git, Docker Desktop (démarré), environ 10 Go libres pour les images.
 
-1. Cloner le dépôt.
-2. Copier `.env.example` en `.env`.
-3. *(à venir)* `docker compose -f infra/docker-compose.yml up -d`
+1. Cloner le dépôt, puis se placer à sa racine.
+2. Copier `.env.example` en `.env` : `copy .env.example .env` (Windows) ou `cp .env.example .env`.
+3. Lancer l'infrastructure (10 à 20 min la première fois, le temps de télécharger et construire les images) :
+   ```
+   docker compose -f infra/docker-compose.yml --env-file .env up -d --build
+   ```
+4. Vérifier que tout fonctionne :
+   ```
+   docker compose -f infra/docker-compose.yml --env-file .env exec jupyter python3 infra/check_infra.py
+   ```
+5. Arrêter : `docker compose -f infra/docker-compose.yml --env-file .env down`
+   (les données restent ; ajouter `-v` efface aussi les données de MinIO et PostgreSQL).
+
+| Service | Adresse | Identifiants (par défaut) |
+|---|---|---|
+| MinIO (Data Lake, console web) | http://localhost:9001 | `urbanhub` / `urbanhub123` |
+| Spark master | http://localhost:8080 | |
+| Spark worker | http://localhost:8081 | |
+| Jupyter Lab (notebooks, jobs Spark) | http://localhost:8888 | |
+| Superset (dashboard) | http://localhost:8088 | `admin` / `admin` |
+| PostgreSQL | `localhost:5432`, base `urbanhub` | `urbanhub` / `urbanhub123` |
+
+**Où lancer quoi ?**
+- Les **jobs Spark et les notebooks** tournent dans le conteneur `jupyter`, où le projet est monté
+  dans `/app`. Cela évite d'installer Java et Spark sur Windows. Dans ce conteneur, les adresses
+  sont `http://minio:9000`, `postgres:5432` et `spark://spark-master:7077` (déjà configurées).
+- Les **collecteurs** (simples appels d'API) peuvent tourner sur le PC avec le Python local ;
+  ils joignent MinIO sur `http://localhost:9000`.
 
 ## Avancement
 
