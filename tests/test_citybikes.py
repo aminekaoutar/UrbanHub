@@ -7,6 +7,7 @@ import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql import types as T
 
+from common.schemas import MOBILITY_CITY_HOURLY, STATION_STATUS
 from pipelines.streaming_citybikes import clean, curate
 from pipelines.streaming_citybikes.collector import raw_key
 
@@ -84,3 +85,36 @@ def test_curated_ville_heure(clean_df):
 def test_raw_key_partitionne_par_date():
     assert raw_key("velib", datetime(2026, 11, 18, 14, 30)) == \
         "citybikes/networks/year=2026/month=11/day=18/velib_20261118T143000Z.json.gz"
+
+
+def _types(schema):
+    return {f.name: f.dataType.simpleString() for f in schema.fields}
+
+
+def test_types_conformes_a_schemas_py(clean_df):
+    """Les tables du Dev 2 ont exactement les types de common/schemas.py (contrat, Dev 3)."""
+    clean_types = dict(clean_df.dtypes)
+    assert {c: clean_types[c] for c in _types(STATION_STATUS)} == _types(STATION_STATUS)
+    city = curate.city_hourly(curate.station_hourly(clean_df))
+    assert dict(city.dtypes) == _types(MOBILITY_CITY_HOURLY) and city.columns == MOBILITY_CITY_HOURLY.fieldNames()
+
+
+def test_collecteur_s_arrete_au_premier_429(monkeypatch):
+    """Un 429 suspend le passage (pas d'appel aux réseaux suivants) et bloque jusqu'au Retry-After."""
+    from pipelines.streaming_citybikes import collector
+
+    calls = []
+
+    class Resp:
+        status_code, headers = 429, {"Retry-After": "600"}
+
+    class Session:
+        def get(self, url, timeout):
+            calls.append(url)
+            return Resp()
+
+    monkeypatch.setattr(collector, "_blocked_until", 0.0)
+    res = collector.collect_once(Session())
+    assert len(calls) == 1 and list(res.values()) == ["BLOQUÉ (429)"]
+    assert collector._blocked_until - __import__("time").monotonic() > 590
+    assert set(collector.NETWORKS) <= {"paris", "lyon", "lille"}

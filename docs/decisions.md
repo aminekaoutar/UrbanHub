@@ -25,5 +25,5 @@ Propositions par défaut du guide (section 8). Remplacer « à valider » par la
 | 2026-11-19 | Les jobs Spark et notebooks tournent dans le conteneur `jupyter` (même image que le cluster), pour éviter d'installer Java/Spark sous Windows. Python y est en 3.10 (version de l'image Spark officielle) ; le driver et les workers doivent avoir la même version. | Dev 1 |
 | 2026-11-19 | Villes réduites à paris, lyon, lille | Dev 3 (à valider par Dev 1 et Dev 2 dans la PR) |
 | 2026-11-19 | Période étudiée : 2024, 2025, 2026 (toutes sources) | Dev 3 (à valider par Dev 1 et Dev 2 dans la PR) |
-| 2026-11-19 | CityBikes : relevé toutes les **3 min** (et non 2) : quota API de 300 appels/h, mesuré dans l'en-tête `x-ratelimit-limit-hour` | Dev 2 (à valider par Dev 1 et Dev 3 dans la PR) |
+| 2026-11-19 | CityBikes : collecte limitée aux villes de `common/cities.py` (paris, lyon, lille), relevé toutes les **2 min** = 90 appels/h. Le quota API (300 appels/h) est **par adresse IP** : il est partagé avec tout le wifi (ex. école) ; en cas de blocage (429) le collecteur attend le délai demandé | Dev 2 |
 | 2026-11-19 | CityBikes : Marseille (`le-velo`) renvoie 0 vélo dans toutes les stations et Nice (`pony-nice`) 0 station → hors analyses mobilité. Sans impact avec les villes paris, lyon, lille | Dev 2 |

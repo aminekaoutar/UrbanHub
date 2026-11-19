@@ -41,7 +41,7 @@ SPARK_MASTER = _get("SPARK_MASTER_URL", "local[*]")
 
 # CityBikes (Développeur 2)
 CITYBIKES_BASE_URL = _get("CITYBIKES_BASE_URL", "https://api.citybik.es/v2")
-CITYBIKES_INTERVAL_SECONDS = int(_get("CITYBIKES_INTERVAL_SECONDS", "180"))   # 10 réseaux x 20 appels/h = 200 appels/h (< 300/h)
+CITYBIKES_INTERVAL_SECONDS = int(_get("CITYBIKES_INTERVAL_SECONDS", "120"))   # 3 réseaux x 30 appels/h = 90 appels/h (quota : 300/h par IP)
 
 # OpenAQ (Développeur 3)
 OPENAQ_API_KEY = _get("OPENAQ_API_KEY", "")

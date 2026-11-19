@@ -35,6 +35,7 @@ x-spark-env: &spark-env
   POSTGRES_USER: ${POSTGRES_USER:-urbanhub}
   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-urbanhub123}
   SPARK_MASTER_URL: spark://spark-master:7077
+  MINIO_ENABLED: "true"      # dans Docker, les jobs lisent / écrivent dans MinIO (s3a://), pas sur le disque local
   TZ: UTC
 
 services:

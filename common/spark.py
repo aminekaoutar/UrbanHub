@@ -14,9 +14,13 @@ def get_spark(app_name: str = "urbanhub") -> SparkSession:
     # les workers Python doivent utiliser le même Python que le driver (sinon PYTHON_VERSION_MISMATCH)
     os.environ.setdefault("PYSPARK_PYTHON", sys.executable)
     os.environ.setdefault("PYSPARK_DRIVER_PYTHON", sys.executable)
-    packages = [POSTGRES_JDBC] + ([HADOOP_AWS] if config.MINIO_ENABLED else [])
-    b = (SparkSession.builder.appName(app_name).master(config.SPARK_MASTER)
-         .config("spark.jars.packages", ",".join(packages))
+    # l'image Docker (infra/spark/Dockerfile) contient déjà les connecteurs : on ne les télécharge que hors Docker
+    in_image = os.path.exists("/opt/spark/jars/hadoop-aws-3.3.4.jar")
+    packages = [] if in_image else [POSTGRES_JDBC] + ([HADOOP_AWS] if config.MINIO_ENABLED else [])
+    b = (SparkSession.builder.appName(app_name).master(config.SPARK_MASTER))
+    if packages:
+        b = b.config("spark.jars.packages", ",".join(packages))
+    b = (b
          .config("spark.sql.session.timeZone", "UTC")                       # contrat : tous les timestamps en UTC
          # la JVM aussi en UTC, sinon le JDBC décale les heures vers PostgreSQL du fuseau de la machine (+1 h à Paris)
          .config("spark.driver.extraJavaOptions", "-Duser.timezone=UTC")

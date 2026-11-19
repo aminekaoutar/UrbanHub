@@ -4,7 +4,7 @@
 
 | Fichier | Rôle |
 |---|---|
-| `pipelines/streaming_citybikes/collector.py` | Collecteur 24 h/24 : 9 réseaux toutes les 3 min → `raw/citybikes/networks/year=/month=/day=/<réseau>_<UTC>.json.gz` |
+| `pipelines/streaming_citybikes/collector.py` | Collecteur 24 h/24 : réseaux de paris, lyon, lille (`common/cities.py`) toutes les 2 min → `raw/citybikes/networks/year=/month=/day=/<réseau>_<UTC>.json.gz` |
 | `pipelines/streaming_citybikes/clean.py` | raw → `clean/citybikes/station_status` (Parquet, year/month/day) |
 | `pipelines/streaming_citybikes/curate.py` | clean → `curated/citybikes/station_hourly` + **`curated/citybikes/mobility_city_hourly`** (livraison contrat 4.3) + publication PostgreSQL |
 | `pipelines/streaming_citybikes/run.py` | clean (hier + aujourd'hui) → curate → publish, une fois ou toutes les heures |
@@ -12,6 +12,10 @@
 | `analysis/mobility/partie2_mobilite.ipynb` | les 5 questions métier + graphiques (`docs/resultats/figures/mobilite/`) |
 | `common/config.py`, `spark.py`, `storage.py`, `publish.py` | code commun piloté par le Dev 2 (étape 1) |
 | `tests/test_citybikes.py`, `tests/smoke_lake.py` | tests du pipeline et du contrat ; test Spark ↔ MinIO ↔ PostgreSQL (jalon 1) |
+
+## ⚠️ La machine de collecte doit rester **branchée sur secteur**
+
+Nuit du 18 au 19/11 : batterie à 1 % → veille forcée de 00:21 à 07:48 → ~7 h de données perdues. `caffeinate` empêche la veille normale, pas la veille batterie vide ni la fermeture du capot.
 
 ## Lancer
 
@@ -33,7 +37,7 @@ Avant que l'infra soit prête, tout est écrit dans `data/` avec la même arbore
 
 ## Décisions à valider (à reporter dans `docs/decisions.md`)
 
-1. **Fréquence 3 min, pas 2.** Quota CityBikes = 300 appels/heure (en-tête `x-ratelimit-limit-hour`). 10 réseaux toutes les 2 min = 300/h : aucune marge. 9 réseaux × 20/h = 180/h.
+1. **2 min, villes du contrat uniquement (paris, lyon, lille).** Quota CityBikes = 300 appels/heure **par adresse IP** (partagé avec tout le wifi). 3 réseaux × 30/h = 90/h. Sur un 429, le collecteur attend le `Retry-After` au lieu de réessayer.
 2. **Nice non couverte côté vélos** : le seul réseau CityBikes de Nice (`pony-nice`) renvoie 0 station (flotte libre). Le référentiel commun garde Nice pour la météo et la pollution.
 3. **Marseille** (`le-velo`) : le flux renvoie actuellement `free_bikes = 0` dans les 229 stations (vérifié dans le JSON brut). Les données sont collectées, mais Marseille est exclue des analyses tant que la source est fausse.
 4. **raw en `.json.gz`** : la réponse est gardée telle quelle, compressée (~130 Mo/jour au lieu de ~1,3 Go). Spark lit le gzip sans configuration.

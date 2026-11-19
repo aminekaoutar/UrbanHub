@@ -18,6 +18,7 @@ from pyspark.sql import functions as F
 
 from common import config
 from common.publish import publish
+from common.schemas import MOBILITY_CITY_HOURLY
 from common.spark import get_spark
 
 CLEAN = "citybikes/station_status"
@@ -62,8 +63,9 @@ def city_hourly(st: DataFrame) -> DataFrame:
                 F.sum(F.col("is_empty").cast("int")).alias("nb_empty_stations"),
                 F.sum(F.col("is_full").cast("int")).alias("nb_full_stations"))
             .withColumn("occupancy_rate", F.when(F.col("capacity") > 0, F.round(F.col("bikes_available") / F.col("capacity"), 4)))
-            .select("city", "timestamp", "bikes_available", "free_slots", "capacity", "occupancy_rate",
-                    "usage_events", "nb_stations", "nb_empty_stations", "nb_full_stations"))
+            # colonnes et types exacts du contrat (common/schemas.py) : les sommes de moyennes sont arrondies à l'entier
+            .select(*[(F.round(f.name) if f.name in ("bikes_available", "free_slots", "capacity") else F.col(f.name))
+                      .cast(f.dataType).alias(f.name) for f in MOBILITY_CITY_HOURLY.fields]))
 
 
 def _write(df: DataFrame, path: str):
