@@ -19,7 +19,7 @@ Lancement (depuis la racine du projet, sur le PC) :
     docker compose -f infra/docker-compose.yml --env-file .env exec jupyter python3 -m pipelines.batch_noaa.download
 
 Options utiles :
-    --years 2022 2023     années à télécharger (défaut : 2022 2023 2024 2025)
+    --years 2024 2025     années à télécharger (défaut : 2024 2025)
     --workers 16          nombre de téléchargements en parallèle (défaut : 16)
     --limit 5             ne télécharger que 5 fichiers (pour tester)
     --dry-run             afficher ce qui serait téléchargé, sans rien télécharger
@@ -45,7 +45,7 @@ from botocore.exceptions import ClientError
 # ---------------------------------------------------------------------------
 STATIONS_URL = "https://www.ncei.noaa.gov/pub/data/noaa/isd-history.csv"
 NOAA_BUCKET_URL = "https://noaa-global-hourly-pds.s3.amazonaws.com"
-DEFAULT_YEARS = [2022, 2023, 2024, 2025]
+DEFAULT_YEARS = [2024, 2025]      # décision d'équipe (docs/decisions.md)
 COUNTRY = "FR"
 
 RAW_BUCKET = os.environ.get("BUCKET_RAW", "raw")
