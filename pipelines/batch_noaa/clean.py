@@ -41,6 +41,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import reduce
 
 import boto3
+from botocore.config import Config
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
@@ -119,6 +120,7 @@ def group_files_by_header(years: list[int]) -> dict[tuple[str, ...], list[str]]:
         aws_access_key_id=os.environ.get("MINIO_ROOT_USER", "urbanhub"),
         aws_secret_access_key=os.environ.get("MINIO_ROOT_PASSWORD", "urbanhub123"),
         region_name="us-east-1",
+        config=Config(max_pool_connections=16),   # autant de connexions que de lecteurs en parallèle
     )
     paginator = s3.get_paginator("list_objects_v2")
     keys = [obj["Key"]
