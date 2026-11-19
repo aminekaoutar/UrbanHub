@@ -27,3 +27,4 @@ Propositions par défaut du guide (section 8). Remplacer « à valider » par la
 | 2026-11-19 | Période étudiée : 2024, 2025, 2026 (toutes sources) | Dev 3 (à valider par Dev 1 et Dev 2 dans la PR) |
 | 2026-11-19 | CityBikes : collecte limitée aux villes de `common/cities.py` (paris, lyon, lille), relevé toutes les **2 min** = 90 appels/h. Le quota API (300 appels/h) est **par adresse IP** : il est partagé avec tout le wifi (ex. école) ; en cas de blocage (429) le collecteur attend le délai demandé | Dev 2 |
 | 2026-11-19 | CityBikes : Marseille (`le-velo`) renvoie 0 vélo dans toutes les stations et Nice (`pony-nice`) 0 station → hors analyses mobilité. Sans impact avec les villes paris, lyon, lille | Dev 2 |
+| 2026-11-19 | OpenAQ : seules les stations officielles fixes sont gardées (`isMonitor = true`, réseau EEA) ; capteurs bon marché (AirGradient, HabitatMap) écartés | Dev 3 |
