@@ -103,6 +103,11 @@ services:
       <<: *spark-env
       SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-2}
       SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-2g}
+      # Les fonctions Python des jobs (ex. common.cities.assign_city) s'exécutent sur le worker :
+      # il doit voir le code du projet, sinon "No module named 'common'".
+      PYTHONPATH: /app
+    volumes:
+      - ..:/app:ro
     ports:
       - "127.0.0.1:8081:8081"   # interface web du worker
     depends_on:
@@ -159,6 +164,51 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    restart: unless-stopped
+
+  # ==========================================================================
+  # COLLECTE EN CONTINU (profil "collecte") : à allumer sur la machine de démo seulement.
+  #   Allumer  : docker compose -f infra/docker-compose.yml --env-file .env --profile collecte up -d
+  #   Arrêter  : docker compose -f infra/docker-compose.yml --env-file .env --profile collecte stop collecte-pollution pipeline
+  #   Journaux : docker compose -f infra/docker-compose.yml --env-file .env --profile collecte logs -f pipeline
+  # Sans "--profile collecte", ces services ne démarrent pas (les autres PC ne collectent pas).
+  # restart: unless-stopped -> ils repartent tout seuls après une mise en veille ou un redémarrage de Docker.
+  # ==========================================================================
+
+  # Pollution (Dev 3) : dernières mesures OpenAQ toutes les 15 min -> raw/openaq/
+  collecte-pollution:
+    <<: *spark-image
+    profiles: ["collecte"]
+    command: python3 -m pipelines.iot_openaq.collector live
+    working_dir: /app
+    environment:
+      <<: *spark-env
+      OPENAQ_API_KEY: ${OPENAQ_API_KEY:-}     # clé gratuite, à mettre dans .env
+    volumes:
+      - ..:/app
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Toutes les heures : météo, puis clean -> curated -> PostgreSQL pour chaque source (pipelines/run_pipeline.py)
+  pipeline:
+    <<: *spark-image
+    profiles: ["collecte"]
+    command: python3 -m pipelines.run_pipeline --every 3600
+    hostname: pipeline          # nom utilisé par les workers Spark pour joindre ce "driver"
+    working_dir: /app
+    environment:
+      <<: *spark-env
+    volumes:
+      - ..:/app
+    depends_on:
+      minio:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      spark-master:
+        condition: service_started
     restart: unless-stopped
 
 volumes:

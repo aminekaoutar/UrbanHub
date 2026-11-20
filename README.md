@@ -54,6 +54,24 @@ Prérequis : Git, Docker Desktop (démarré), environ 10 Go libres pour les imag
 - **Développeur 2 (CityBikes)** : collecteur, clean, curated, notebook Partie 2 → [`docs/dev2_citybikes.md`](docs/dev2_citybikes.md)
 - **Site web interactif** (tous) : `.venv/bin/python -m dashboard.webapp` puis http://127.0.0.1:8000 → [`dashboard/webapp/README.md`](dashboard/webapp/README.md)
 
+## Collecte en continu (machine de démo)
+
+Sur la machine qui sert à la démo, deux services de plus tournent en continu et redémarrent seuls
+(même après une mise en veille) :
+
+| Service | Rôle |
+|---|---|
+| `collecte-pollution` | collecteur OpenAQ (Dev 3), toutes les 15 min → `raw/openaq/` (clé `OPENAQ_API_KEY` dans `.env`) |
+| `pipeline` | toutes les heures : `pipelines/run_pipeline.py` → météo, puis clean → curated → PostgreSQL pour chaque source |
+
+```
+docker compose -f infra/docker-compose.yml --env-file .env --profile collecte up -d       # allumer
+docker compose -f infra/docker-compose.yml --env-file .env --profile collecte logs -f pipeline   # suivre
+docker compose -f infra/docker-compose.yml --env-file .env --profile collecte stop collecte-pollution pipeline  # arrêter
+```
+
+Journaux aussi dans `logs/` (ignoré par Git). Le collecteur vélos (Dev 2) sera ajouté quand son code sera dans `main`.
+
 ## Règles Git
 
 - On ne pousse jamais directement sur `main` : une branche par tâche
