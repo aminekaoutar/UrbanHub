@@ -45,6 +45,13 @@ LABEL_COLORS = {
 }
 
 
+# Palette « supersetColors » de Superset 5.0. Sans elle dans color_scheme_domain, Superset considère que la
+# palette a changé et efface label_colors (nos couleurs fixes) au premier affichage.
+SCHEME_COLORS = ["#1FA8C9", "#454E7C", "#5AC189", "#FF7F44", "#666666", "#E04355", "#FCC700", "#A868B7", "#3CCCCB",
+                 "#A38F79", "#8FD3E4", "#A1A6BD", "#ACE1C4", "#FEC0A1", "#B2B2B2", "#EFA1AA", "#FDE380", "#D3B3DA",
+                 "#9EE5E5", "#D1C6BC"]
+
+
 # ============================================================================ API
 class Superset:
     def __init__(self):
@@ -581,7 +588,8 @@ def build():
 
     metadata = {
         "native_filter_configuration": filters, "color_scheme": "supersetColors", "label_colors": LABEL_COLORS,
-        "shared_label_colors": [], "color_scheme_domain": [], "cross_filters_enabled": True,
+        "shared_label_colors": [], "color_scheme_domain": SCHEME_COLORS, "map_label_colors": {},
+        "cross_filters_enabled": True,
         "refresh_frequency": 3600, "timed_refresh_immune_slices": [], "expanded_slices": {}, "default_filters": "{}",
         "chart_configuration": {str(c): {"id": c, "crossFilters": {"scope": "global", "chartsInScope": [x for x in all_charts if x != c]}}
                                 for c in all_charts},
