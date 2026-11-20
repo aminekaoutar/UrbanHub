@@ -38,6 +38,7 @@ STEPS = [
     ("pollution · clean", "pipelines.iot_openaq.clean"),
     ("pollution · curate", "pipelines.iot_openaq.curate"),
     ("vélos · clean + curate", "pipelines.streaming_citybikes.run"),
+    ("vélos · profil des stations", "dashboard.superset.station_profile"),   # 1 fois / 20 h (dashboard)
     ("croisé · urban_city_hourly", "pipelines.iot_openaq.urban"),
 ]
 

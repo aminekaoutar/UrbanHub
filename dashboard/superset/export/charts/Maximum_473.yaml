@@ -1,0 +1,30 @@
+slice_name: Maximum
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 9__table
+  metric:
+    expressionType: SQL
+    sqlExpression: MAX(tmax)
+    label: "\xB0C"
+    optionName: metric_93aa22e3
+  subheader: "\xB0C (relev\xE9 horaire)"
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .1f
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: 51fa1e35-0363-4011-93f8-38d20f7d53db
+version: 1.0.0
+dataset_uuid: 076d285d-e58b-4a87-bd45-65550f69482d

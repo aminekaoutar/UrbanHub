@@ -1,0 +1,46 @@
+slice_name: "Couverture des donn\xE9es : heures disponibles par source (3 villes)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_bar
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_bar
+  datasource: 7__table
+  x_axis: timestamp
+  metrics:
+  - expressionType: SQL
+    sqlExpression: COUNT(*)
+    label: Heures (3 villes)
+    optionName: metric_7fff45e2
+  groupby:
+  - source
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: SMART_NUMBER
+  y_axis_title: "heures \xD7 villes"
+  order_desc: true
+  time_grain_sqla: P1M
+query_context: null
+cache_timeout: null
+uuid: 27497ef7-9d25-4a38-948a-0c422b3c5630
+version: 1.0.0
+dataset_uuid: 66b1c52a-d13c-4101-abe7-905506de401a

@@ -1,0 +1,38 @@
+slice_name: "Temp\xE9rature (\xB0C)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number
+  datasource: 1__table
+  x_axis: timestamp
+  time_grain_sqla: PT1H
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(temperature)
+    label: "Temp\xE9rature (\xB0C)"
+    optionName: metric_a0f0d194
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: 'DATEADD(DATETIME("now"), -7, day) : now'
+    expressionType: SIMPLE
+  show_trend_line: true
+  start_y_axis_at_zero: false
+  y_axis_format: .1f
+  compare_lag: 24
+  compare_suffix: vs il y a 24 h
+  show_timestamp: true
+  time_format: smart_date
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+  rolling_type: None
+query_context: null
+cache_timeout: null
+uuid: 749649f0-721a-4838-b7de-675438d847f3
+version: 1.0.0
+dataset_uuid: d37324c8-9242-4a55-8ea0-501a9750d216

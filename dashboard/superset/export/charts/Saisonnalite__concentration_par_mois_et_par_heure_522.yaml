@@ -1,0 +1,44 @@
+slice_name: "Saisonnalit\xE9 : concentration par mois et par heure"
+description: null
+certified_by: null
+certification_details: null
+viz_type: heatmap_v2
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: heatmap_v2
+  datasource: 12__table
+  x_axis: heure
+  groupby: mois
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(value)
+    label: "\xB5g/m\xB3"
+    optionName: metric_0b539c3a
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  linear_color_scheme: purples
+  normalize_across: heatmap
+  legend_type: continuous
+  show_legend: true
+  show_values: false
+  show_percentage: false
+  sort_x_axis: alpha_asc
+  sort_y_axis: alpha_asc
+  y_axis_format: .1f
+  xscale_interval: 3
+  yscale_interval: 1
+  left_margin: auto
+  bottom_margin: auto
+  value_bounds:
+  - null
+  - null
+query_context: null
+cache_timeout: null
+uuid: 264df540-32ad-43de-bca1-c4b691c9337c
+version: 1.0.0
+dataset_uuid: 5202601b-0690-472e-a00f-456c5d15e72b

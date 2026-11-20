@@ -1,0 +1,254 @@
+table_name: v_weather_hourly
+main_dttm_col: timestamp
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: 600
+catalog: urbanhub
+schema: public
+sql: "SELECT city, timestamp, temperature, precipitation, wind_speed, wind_direction,\
+  \ pressure, visibility, source,\n       \n    to_char(local, 'HH24') || 'h' AS heure,\n\
+  \    extract(hour FROM local)::int AS hour_local,\n    extract(isodow FROM local)::int\
+  \ || ' \xB7 ' ||\n        (ARRAY['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'])[extract(isodow\
+  \ FROM local)::int] AS jour,\n    CASE WHEN extract(isodow FROM local) >= 6 THEN\
+  \ 'Week-end' ELSE 'Semaine' END AS type_jour,\n    to_char(local, 'MM') || ' \xB7\
+  \ ' ||\n        (ARRAY['Janv.','F\xE9vr.','Mars','Avr.','Mai','Juin','Juil.','Ao\xFB\
+  t','Sept.','Oct.','Nov.','D\xE9c.'])[extract(month FROM local)::int] AS mois,\n\
+  \    CASE WHEN extract(month FROM local) IN (12, 1, 2) THEN '1 \xB7 Hiver'\n   \
+  \      WHEN extract(month FROM local) IN (3, 4, 5) THEN '2 \xB7 Printemps'\n   \
+  \      WHEN extract(month FROM local) IN (6, 7, 8) THEN '3 \xB7 \xC9t\xE9'\n   \
+  \      ELSE '4 \xB7 Automne' END AS saison,\n       CASE WHEN precipitation IS NULL\
+  \ THEN NULL WHEN precipitation = 0 THEN '0 \xB7 Sec'\n         WHEN precipitation\
+  \ < 1 THEN '1 \xB7 Faible (< 1 mm/h)' WHEN precipitation < 4 THEN '2 \xB7 Mod\xE9\
+  r\xE9e (1-4 mm/h)'\n         ELSE '3 \xB7 Forte (\u2265 4 mm/h)' END AS pluie,\n\
+  \       CASE WHEN wind_speed IS NULL THEN NULL WHEN wind_speed < 2 THEN '1 \xB7\
+  \ Calme (< 2 m/s)'\n         WHEN wind_speed < 4 THEN '2 \xB7 Faible (2-4 m/s)'\
+  \ WHEN wind_speed < 6 THEN '3 \xB7 Mod\xE9r\xE9 (4-6 m/s)'\n         WHEN wind_speed\
+  \ < 9 THEN '4 \xB7 Soutenu (6-9 m/s)' ELSE '5 \xB7 Fort (\u2265 9 m/s)' END AS vent\n\
+  FROM (SELECT *, ((timestamp AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Paris') AS\
+  \ local FROM weather_city_hourly) w"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 64b97ddd-b083-4b81-96b0-1f0f9e82aa1b
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: type_jour
+  verbose_name: Type de jour
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: wind_speed
+  verbose_name: Vent (m/s)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: temperature
+  verbose_name: "Temp\xE9rature (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pressure
+  verbose_name: Pression (hPa)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: precipitation
+  verbose_name: Pluie (mm)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: visibility
+  verbose_name: "Visibilit\xE9 (m)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: heure
+  verbose_name: Heure (Paris)
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: timestamp
+  verbose_name: Date
+  is_dttm: true
+  is_active: true
+  type: DATETIME
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: jour
+  verbose_name: Jour
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: mois
+  verbose_name: Mois
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pluie
+  verbose_name: Pluie
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: saison
+  verbose_name: Saison
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: source
+  verbose_name: Source
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: city
+  verbose_name: Ville
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: vent
+  verbose_name: Vent
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: wind_direction
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: hour_local
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 18212977-06e9-4a8c-b8e0-2703db8e347e

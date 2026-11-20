@@ -1,0 +1,30 @@
+slice_name: Taux de remplissage moyen
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 10__table
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(occupancy_rate)
+    label: remplissage
+    optionName: metric_9b5e3faf
+  subheader: "des places occup\xE9es par un v\xE9lo"
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .0%
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: b9b98e7f-1b7f-4347-a72c-e517d6c20a0e
+version: 1.0.0
+dataset_uuid: 163ed8ef-3221-4c8d-b241-932f01318927

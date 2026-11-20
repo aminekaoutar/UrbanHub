@@ -1,0 +1,48 @@
+slice_name: "Visibilit\xE9 par mois et par heure (m) : les brouillards du matin en\
+  \ hiver"
+description: null
+certified_by: null
+certification_details: null
+viz_type: heatmap_v2
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: heatmap_v2
+  datasource: 8__table
+  x_axis: heure
+  groupby: mois
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(visibility)
+    label: m
+    optionName: metric_2a3354e2
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: visibility IS NOT NULL
+  linear_color_scheme: blue_white_yellow
+  normalize_across: heatmap
+  legend_type: continuous
+  show_legend: true
+  show_values: false
+  show_percentage: false
+  sort_x_axis: alpha_asc
+  sort_y_axis: alpha_asc
+  y_axis_format: ',.0f'
+  xscale_interval: 3
+  yscale_interval: 1
+  left_margin: auto
+  bottom_margin: auto
+  value_bounds:
+  - null
+  - null
+query_context: null
+cache_timeout: null
+uuid: 2dc4d78f-fc53-4c2e-bedd-725b2c06da9a
+version: 1.0.0
+dataset_uuid: 64b97ddd-b083-4b81-96b0-1f0f9e82aa1b

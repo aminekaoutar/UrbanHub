@@ -1,0 +1,49 @@
+slice_name: "Zones les plus sous-\xE9quip\xE9es"
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  color_scheme: supersetColors
+  row_limit: 20
+  viz_type: table
+  datasource: 11__table
+  query_mode: raw
+  all_columns:
+  - zone
+  - nb_stations
+  - capacity
+  - usage_per_day
+  - rotation
+  - pct_empty
+  order_by_cols:
+  - '["rotation", false]'
+  server_page_length: 10
+  adhoc_filters:
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: nb_stations >= 2
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: rotation IS NOT NULL
+  table_timestamp_format: '%d/%m/%Y'
+  include_search: false
+  show_cell_bars: true
+  page_length: 0
+  align_pn: false
+  color_pn: false
+  allow_rearrange_columns: true
+  column_config:
+    capacity:
+      d3NumberFormat: ',.0f'
+    usage_per_day:
+      d3NumberFormat: ',.0f'
+    rotation:
+      d3NumberFormat: .1f
+    pct_empty:
+      d3NumberFormat: .0%
+query_context: null
+cache_timeout: null
+uuid: b36bb496-4a47-4b41-981d-c8c554b8e28a
+version: 1.0.0
+dataset_uuid: e7f2e56e-c3fc-415f-8e62-477b3e49a7b7

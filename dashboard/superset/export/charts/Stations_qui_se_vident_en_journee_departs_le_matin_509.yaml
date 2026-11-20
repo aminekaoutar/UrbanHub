@@ -1,0 +1,42 @@
+slice_name: "Stations qui se vident en journ\xE9e (d\xE9parts le matin)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  color_scheme: supersetColors
+  row_limit: 15
+  viz_type: table
+  datasource: 17__table
+  query_mode: raw
+  all_columns:
+  - station_name
+  - city
+  - occ_night
+  - occ_day
+  order_by_cols:
+  - '["imbalance", true]'
+  server_page_length: 10
+  adhoc_filters:
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: imbalance IS NOT NULL
+  table_timestamp_format: '%d/%m/%Y'
+  include_search: false
+  show_cell_bars: false
+  page_length: 0
+  align_pn: false
+  color_pn: false
+  allow_rearrange_columns: true
+  column_config:
+    occ_night:
+      d3NumberFormat: .0%
+    occ_day:
+      d3NumberFormat: .0%
+    imbalance:
+      d3NumberFormat: +.0%
+query_context: null
+cache_timeout: null
+uuid: 2237781c-2d22-4dec-8ba6-abc7c383cca8
+version: 1.0.0
+dataset_uuid: 7c619e44-bfa1-4352-b9d8-b83e9439381e

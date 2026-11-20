@@ -1,0 +1,250 @@
+table_name: v_weather_daily
+main_dttm_col: timestamp
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: 600
+catalog: urbanhub
+schema: public
+sql: "WITH d AS (\n    SELECT city, date_trunc('day', ((timestamp AT TIME ZONE 'UTC')\
+  \ AT TIME ZONE 'Europe/Paris')) AS timestamp,\n           avg(temperature) AS tmean,\
+  \ min(temperature) AS tmin, max(temperature) AS tmax,\n           sum(precipitation)\
+  \ AS precip_mm, avg(wind_speed) AS wind_mean, max(wind_speed) AS wind_max,\n   \
+  \        avg(visibility) AS visibility, avg(pressure) AS pressure, max(source) AS\
+  \ source,\n           count(temperature) AS nb_hours\n    FROM weather_city_hourly\
+  \ GROUP BY 1, 2\n), normale AS (   -- normale du mois sur 2024-2026, par ville\n\
+  \    SELECT city, extract(month FROM timestamp) AS m, avg(tmean) AS t_normale, stddev(tmean)\
+  \ AS t_sd\n    FROM d GROUP BY 1, 2\n)\nSELECT d.*, n.t_normale, d.tmean - n.t_normale\
+  \ AS t_anomalie,\n       (d.tmean - n.t_normale) / NULLIF(n.t_sd, 0) AS z_score,\n\
+  \       CASE WHEN (d.tmean - n.t_normale) / NULLIF(n.t_sd, 0) >= 1.5 THEN 'Anormalement\
+  \ chaud'\n            WHEN (d.tmean - n.t_normale) / NULLIF(n.t_sd, 0) <= -1.5 THEN\
+  \ 'Anormalement froid'\n            ELSE 'Normal' END AS anomalie,\n       CASE\
+  \ WHEN extract(isodow FROM d.timestamp) >= 6 THEN 'Week-end' ELSE 'Semaine' END\
+  \ AS type_jour\nFROM d JOIN normale n ON n.city = d.city AND n.m = extract(month\
+  \ FROM d.timestamp)\nWHERE d.nb_hours >= 12   -- journ\xE9es assez compl\xE8tes\
+  \ pour une moyenne fiable"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 076d285d-e58b-4a87-bd45-65550f69482d
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: t_anomalie
+  verbose_name: "\xC9cart \xE0 la normale (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: t_normale
+  verbose_name: "Normale du mois (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: z_score
+  verbose_name: "\xC9cart (en \xE9carts-types)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: tmax
+  verbose_name: "Temp. max (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: tmean
+  verbose_name: "Temp. moyenne (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: tmin
+  verbose_name: "Temp. min (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: wind_max
+  verbose_name: Vent max (m/s)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: wind_mean
+  verbose_name: Vent moyen (m/s)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: type_jour
+  verbose_name: Type de jour
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pressure
+  verbose_name: Pression (hPa)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: precip_mm
+  verbose_name: Pluie (mm)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: visibility
+  verbose_name: "Visibilit\xE9 (m)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: timestamp
+  verbose_name: Date
+  is_dttm: true
+  is_active: true
+  type: DATETIME
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: anomalie
+  verbose_name: Anomalie
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: source
+  verbose_name: Source
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: city
+  verbose_name: Ville
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: nb_hours
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: LONGINTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 18212977-06e9-4a8c-b8e0-2703db8e347e

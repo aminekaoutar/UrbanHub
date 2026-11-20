@@ -1,0 +1,46 @@
+slice_name: "Top 15 des stations les plus utilis\xE9es"
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  color_scheme: supersetColors
+  row_limit: 15
+  viz_type: table
+  datasource: 5__table
+  query_mode: raw
+  all_columns:
+  - station_name
+  - city
+  - usage_per_day
+  - capacity
+  - occupancy_rate
+  order_by_cols:
+  - '["usage_per_day", false]'
+  server_page_length: 10
+  adhoc_filters:
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: nb_hours >= 720 AND capacity > 0
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: usage_per_day IS NOT NULL
+  table_timestamp_format: '%d/%m/%Y'
+  include_search: false
+  show_cell_bars: true
+  page_length: 0
+  align_pn: false
+  color_pn: false
+  allow_rearrange_columns: true
+  column_config:
+    usage_per_day:
+      d3NumberFormat: ',.0f'
+    capacity:
+      d3NumberFormat: ',.0f'
+    occupancy_rate:
+      d3NumberFormat: .0%
+query_context: null
+cache_timeout: null
+uuid: 6c95e5ca-2612-4493-83c4-098d3c031764
+version: 1.0.0
+dataset_uuid: c1f58bff-1603-4388-8537-67883cda6289

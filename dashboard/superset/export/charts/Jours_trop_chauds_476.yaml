@@ -1,0 +1,33 @@
+slice_name: Jours trop chauds
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 9__table
+  metric:
+    expressionType: SQL
+    sqlExpression: COUNT(*)
+    label: jours
+    optionName: metric_21919a7e
+  subheader: "jours \xD7 villes (\xE9cart \u2265 1,5 \u03C3)"
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: anomalie = 'Anormalement chaud'
+  y_axis_format: ',d'
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: 913a6bac-d621-4ce7-8116-c82a72128ac1
+version: 1.0.0
+dataset_uuid: 076d285d-e58b-4a87-bd45-65550f69482d

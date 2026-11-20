@@ -1,0 +1,36 @@
+slice_name: "Jours avec donn\xE9es des 3 sources"
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 15__table
+  metric:
+    expressionType: SQL
+    sqlExpression: COUNT(*)
+    label: jours
+    optionName: metric_33027bd6
+  subheader: "jours \xD7 villes"
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: usage_per_hour IS NOT NULL
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: pm25 IS NOT NULL AND temperature IS NOT NULL
+  y_axis_format: ',d'
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: 172dd473-e998-4aac-b08f-3d92dd503780
+version: 1.0.0
+dataset_uuid: babdd260-6427-476f-923b-93040c09a4f5

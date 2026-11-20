@@ -1,0 +1,48 @@
+slice_name: Mouvements par station et par heure, selon la ville
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_line
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_line
+  datasource: 10__table
+  x_axis: heure
+  metrics:
+  - expressionType: SQL
+    sqlExpression: AVG(usage_per_station)
+    label: Mouvements / station / h
+    optionName: metric_bfa325e2
+  groupby:
+  - city
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .2f
+  y_axis_title: ''
+  order_desc: true
+  x_axis_sort_asc: true
+  xAxisLabelRotation: 30
+  xAxisLabelInterval: 0
+query_context: null
+cache_timeout: null
+uuid: 1e62c8d1-58a0-47ee-9fe8-0d275322be7a
+version: 1.0.0
+dataset_uuid: 163ed8ef-3221-4c8d-b241-932f01318927

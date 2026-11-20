@@ -1,0 +1,46 @@
+slice_name: Part des stations presque pleines (> 90 %)
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_line
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_line
+  datasource: 10__table
+  x_axis: timestamp
+  metrics:
+  - expressionType: SQL
+    sqlExpression: AVG(pct_full)
+    label: Stations pleines
+    optionName: metric_dd9214b5
+  groupby:
+  - city
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .0%
+  y_axis_title: '% des stations'
+  order_desc: true
+  time_grain_sqla: P1W
+query_context: null
+cache_timeout: null
+uuid: 9a65dca7-b2d5-41c5-b77b-7dd3e5ebbecf
+version: 1.0.0
+dataset_uuid: 163ed8ef-3221-4c8d-b241-932f01318927

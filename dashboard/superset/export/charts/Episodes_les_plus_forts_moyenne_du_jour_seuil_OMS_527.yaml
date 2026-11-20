@@ -1,0 +1,52 @@
+slice_name: "\xC9pisodes les plus forts (moyenne du jour / seuil OMS)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  color_scheme: supersetColors
+  row_limit: 30
+  viz_type: table
+  datasource: 13__table
+  query_mode: raw
+  all_columns:
+  - timestamp
+  - city
+  - pollutant
+  - moyenne
+  - pic
+  - seuil
+  - indice
+  order_by_cols:
+  - '["indice", false]'
+  server_page_length: 10
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: indice IS NOT NULL
+  table_timestamp_format: '%d/%m/%Y'
+  include_search: false
+  show_cell_bars: false
+  page_length: 0
+  align_pn: false
+  color_pn: false
+  allow_rearrange_columns: true
+  column_config:
+    moyenne:
+      d3NumberFormat: .1f
+    pic:
+      d3NumberFormat: .0f
+    seuil:
+      d3NumberFormat: .0f
+    indice:
+      d3NumberFormat: .2f
+query_context: null
+cache_timeout: null
+uuid: e57e8363-f16c-40b2-a70a-5c82bad151a1
+version: 1.0.0
+dataset_uuid: 73c5f9f2-cb32-4875-8032-7801bae0a4a0

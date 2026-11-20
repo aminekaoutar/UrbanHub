@@ -1,0 +1,30 @@
+slice_name: Moyenne
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 9__table
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(tmean)
+    label: "\xB0C"
+    optionName: metric_7d9ee6fc
+  subheader: "\xB0C sur la p\xE9riode"
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .1f
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: e7087af7-9eae-42ba-b82f-7b2f98298f73
+version: 1.0.0
+dataset_uuid: 076d285d-e58b-4a87-bd45-65550f69482d

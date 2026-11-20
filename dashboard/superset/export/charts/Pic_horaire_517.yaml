@@ -1,0 +1,30 @@
+slice_name: Pic horaire
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 12__table
+  metric:
+    expressionType: SQL
+    sqlExpression: MAX(value)
+    label: "\xB5g/m\xB3"
+    optionName: metric_f699935f
+  subheader: "\xB5g/m\xB3 (maximum horaire)"
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: ',.0f'
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: be4dc756-7817-416a-8891-5dce910ef458
+version: 1.0.0
+dataset_uuid: 5202601b-0690-472e-a00f-456c5d15e72b

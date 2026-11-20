@@ -1,0 +1,58 @@
+slice_name: 'Lille : profil des stations'
+description: null
+certified_by: null
+certification_details: null
+viz_type: bubble_v2
+params:
+  color_scheme: supersetColors
+  row_limit: 5000
+  viz_type: bubble_v2
+  datasource: 17__table
+  entity: station_name
+  x:
+    expressionType: SQL
+    sqlExpression: AVG(longitude)
+    label: Longitude
+    optionName: metric_c74f6aa4
+  y:
+    expressionType: SQL
+    sqlExpression: AVG(latitude)
+    label: Latitude
+    optionName: metric_00ea5c12
+  size:
+    expressionType: SQL
+    sqlExpression: SUM(usage_per_day)
+    label: Mouvements / jour
+    optionName: metric_89312647
+  series: profil
+  adhoc_filters:
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: city = 'lille'
+  max_bubble_size: '14'
+  show_legend: true
+  legendOrientation: top
+  x_axis_label: ''
+  y_axis_label: ''
+  xAxisFormat: .2f
+  y_axis_format: .2f
+  tooltipSizeFormat: SMART_NUMBER
+  opacity: 0.6
+  truncateXAxis: true
+  truncateYAxis: true
+  xAxisBounds:
+  - null
+  - null
+  yAxisBounds:
+  - null
+  - null
+  xAxisLabelRotation: 0
+  x_axis_title_margin: 30
+  y_axis_title_margin: 50
+  logXAxis: false
+  logYAxis: false
+query_context: null
+cache_timeout: null
+uuid: 26c75f3c-a280-4466-b223-35fa5ae14b52
+version: 1.0.0
+dataset_uuid: 7c619e44-bfa1-4352-b9d8-b83e9439381e

@@ -1,0 +1,43 @@
+slice_name: "Corr\xE9lations journali\xE8res (r de Pearson, sur toute la p\xE9riode)\
+  \ : > 0 varient ensemble, < 0 en sens inverse"
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_bar
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_bar
+  datasource: 16__table
+  x_axis: relation
+  metrics:
+  - expressionType: SQL
+    sqlExpression: AVG(r)
+    label: r
+    optionName: metric_5d2b4e13
+  groupby:
+  - city
+  adhoc_filters: []
+  y_axis_format: .2f
+  y_axis_title: ''
+  order_desc: true
+  x_axis_sort_asc: true
+  orientation: horizontal
+query_context: null
+cache_timeout: null
+uuid: fb2fbf41-6a58-4f5c-bf03-d313a879e076
+version: 1.0.0
+dataset_uuid: 1e7f5225-08ee-42d3-ba5d-40c999308669
