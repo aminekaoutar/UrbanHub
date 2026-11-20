@@ -8,6 +8,7 @@
 | `pipelines/streaming_citybikes/clean.py` | raw → `clean/citybikes/station_status` (Parquet, year/month/day) |
 | `pipelines/streaming_citybikes/curate.py` | clean → `curated/citybikes/station_hourly` + **`curated/citybikes/mobility_city_hourly`** (livraison contrat 4.3) + publication PostgreSQL |
 | `pipelines/streaming_citybikes/run.py` | clean (hier + aujourd'hui) → curate → publish, une fois ou toutes les heures |
+| `pipelines/streaming_citybikes/history.py` | **historique** data.citybik.es (nov. 2024 → sept. 2026) → `raw/citybikes/history`, `clean/citybikes/station_events`, mois passés de `station_hourly` et `mobility_city_hourly` |
 | `pipelines/streaming_citybikes/city.py` | colonne `city` (règle du contrat : ville la plus proche < 30 km) ; utilise `common/cities.py` dès qu'il existe |
 | `analysis/mobility/partie2_mobilite.ipynb` | les 5 questions métier + graphiques (`docs/resultats/figures/mobilite/`) |
 | `common/config.py`, `spark.py`, `storage.py`, `publish.py` | code commun piloté par le Dev 2 (étape 1) |
@@ -44,6 +45,7 @@ Avant que l'infra soit prête, tout est écrit dans `data/` avec la même arbore
 5. **`timestamp`** = heure du relevé fournie par CityBikes (UTC) ; `ingestion_time` = heure de dépôt (nom du fichier).
 6. **`usage_events`** = somme des |Δ bikes_available| entre deux relevés d'une station, **sauf si l'écart dépasse 15 min** (collecteur arrêté) ; c'est une borne basse de l'usage réel.
 7. **Station vide / pleine** = taux de remplissage moyen sur l'heure < 10 % / > 90 % (contrat 4.3).
+8. **Historique** : https://data.citybik.es (même source, mêmes `station_id`, licence ODbL, citer « Bike-share data by CityBikes contributors and available from https://data.citybik.es »). Le fichier ne contient que les changements d'état : état horaire = dernier état connu (moyenne pondérée par la durée), `usage_events` = somme exacte des |Δ vélos| (donc plus élevé que la borne basse du collecteur). Heures sans aucun changement dans tout le réseau pendant plus de 2 h = panne de la source → retirées. Mois non publiés : velib avr.–juil. 2026, velov juil.–août 2026, vlille juin–juil. 2026, oct. 2026 pour les trois. `python -m pipelines.streaming_citybikes.history` (~20 min, 1,1 Go).
 
 ## Points corrigés dans le code commun (à signaler en relecture)
 

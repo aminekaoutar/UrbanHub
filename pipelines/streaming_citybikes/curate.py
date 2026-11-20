@@ -10,6 +10,7 @@ station (un vélo pris = -1, un vélo rendu = +1). Les écarts de plus de 15 min
 ne sont pas comptés, sinon une coupure ferait croire à un pic d'usage.
 
 Les deux tables sont écrites en Parquet (partitions year/month) puis publiées dans PostgreSQL si celui-ci est lancé.
+Seuls les mois présents dans clean sont réécrits (mode dynamique) : les mois d'historique (history.py) restent.
 
     python -m pipelines.streaming_citybikes.curate
 """
@@ -82,7 +83,10 @@ def run():
     city = city_hourly(st).cache()
     print(f"curated/{STATION_HOURLY} : {st.count():,} lignes -> {_write(st, STATION_HOURLY)}")
     print(f"curated/{CITY_HOURLY} : {city.count():,} lignes -> {_write(city, CITY_HOURLY)}")
-    for name, df in (("station_hourly", st), ("mobility_city_hourly", city)):
+    # on publie tout le dossier curated (mois du collecteur + historique de history.py), pas seulement ce calcul :
+    # publish() remplace la table PostgreSQL entière
+    for name, path in (("station_hourly", STATION_HOURLY), ("mobility_city_hourly", CITY_HOURLY)):
+        df = spark.read.parquet(config.lake_uri("curated", path)).drop("year", "month")
         if publish(df, name):
             print(f"PostgreSQL : table {name} publiée")
 
