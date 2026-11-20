@@ -191,6 +191,21 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # Vélos (Dev 2) : état des stations CityBikes de paris, lyon, lille toutes les 2 min -> raw/citybikes/
+  collecte-velos:
+    <<: *spark-image
+    profiles: ["collecte"]
+    command: python3 -m pipelines.streaming_citybikes.collector
+    working_dir: /app
+    environment:
+      <<: *spark-env
+    volumes:
+      - ..:/app
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: unless-stopped
+
   # Toutes les heures : météo, puis clean -> curated -> PostgreSQL pour chaque source (pipelines/run_pipeline.py)
   pipeline:
     <<: *spark-image

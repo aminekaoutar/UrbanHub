@@ -9,10 +9,12 @@ Mesure d'usage commune : somme des variations absolues de bikes_available entre 
 station (un vélo pris = -1, un vélo rendu = +1). Les écarts de plus de 15 min entre deux relevés (collecteur arrêté)
 ne sont pas comptés, sinon une coupure ferait croire à un pic d'usage.
 
-Les deux tables sont écrites en Parquet (partitions year/month) puis publiées dans PostgreSQL si celui-ci est lancé.
+Les deux tables sont écrites en Parquet (partitions year/month). mobility_city_hourly est publiée dans PostgreSQL
+si celui-ci est lancé ; station_hourly seulement avec --with-stations.
 Seuls les mois présents dans clean sont réécrits (mode dynamique) : les mois d'historique (history.py) restent.
 
-    python -m pipelines.streaming_citybikes.curate
+    python -m pipelines.streaming_citybikes.curate                   # publie mobility_city_hourly
+    python -m pipelines.streaming_citybikes.curate --with-stations   # + station_hourly (lourd)
 """
 from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as F
@@ -76,7 +78,7 @@ def _write(df: DataFrame, path: str):
     return out
 
 
-def run():
+def run(with_stations: bool = False):
     spark = get_spark("citybikes-curate")
     clean = spark.read.parquet(config.lake_uri("clean", CLEAN))
     st = station_hourly(clean).cache()
@@ -84,12 +86,21 @@ def run():
     print(f"curated/{STATION_HOURLY} : {st.count():,} lignes -> {_write(st, STATION_HOURLY)}")
     print(f"curated/{CITY_HOURLY} : {city.count():,} lignes -> {_write(city, CITY_HOURLY)}")
     # on publie tout le dossier curated (mois du collecteur + historique de history.py), pas seulement ce calcul :
-    # publish() remplace la table PostgreSQL entière
-    for name, path in (("station_hourly", STATION_HOURLY), ("mobility_city_hourly", CITY_HOURLY)):
+    # publish() remplace la table PostgreSQL entière.
+    # station_hourly (~29 M lignes) n'est publiée qu'à la demande (--with-stations) : trop lourde pour le passage
+    # horaire de la machine de démo (8 Go) ; le notebook et le site web la lisent dans le Data Lake.
+    tables = [("mobility_city_hourly", CITY_HOURLY)]
+    if with_stations:
+        tables.insert(0, ("station_hourly", STATION_HOURLY))
+    for name, path in tables:
         df = spark.read.parquet(config.lake_uri("curated", path)).drop("year", "month")
         if publish(df, name):
             print(f"PostgreSQL : table {name} publiée")
 
 
 if __name__ == "__main__":
-    run()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--with-stations", action="store_true",
+                    help="publier aussi station_hourly (~29 M lignes) dans PostgreSQL")
+    run(ap.parse_args().with_stations)
