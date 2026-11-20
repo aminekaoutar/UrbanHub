@@ -8,6 +8,8 @@
 | `pipelines/streaming_citybikes/clean.py` | raw → `clean/citybikes/station_status` (Parquet, year/month/day) |
 | `pipelines/streaming_citybikes/curate.py` | clean → `curated/citybikes/station_hourly` + **`curated/citybikes/mobility_city_hourly`** (livraison contrat 4.3) + publication PostgreSQL |
 | `pipelines/streaming_citybikes/run.py` | clean (hier + aujourd'hui) → curate → publish, une fois ou toutes les heures |
+| `pipelines/streaming_citybikes/velov_history.py` | historique **Vélo'v 2024** (janv.–oct.) depuis l'API de la Métropole de Lyon, au format CityBikes → repris par `history.py` |
+| `pipelines/streaming_citybikes/vlille_trips.py` | **trajets V'Lille** (ilévia, avril 2025 →, ~4,9 M) → `raw/ilevia/vlille_trips`, `clean/ilevia/vlille_trips` |
 | `pipelines/streaming_citybikes/history.py` | **historique** data.citybik.es (nov. 2024 → sept. 2026) → `raw/citybikes/history`, `clean/citybikes/station_events`, mois passés de `station_hourly` et `mobility_city_hourly` |
 | `pipelines/streaming_citybikes/city.py` | colonne `city` (règle du contrat : ville la plus proche < 30 km) ; utilise `common/cities.py` dès qu'il existe |
 | `analysis/mobility/partie2_mobilite.ipynb` | les 5 questions métier + graphiques (`docs/resultats/figures/mobilite/`) |

@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UrbanHub</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 26 26%27%3E%3Crect width=%2726%27 height=%2726%27 rx=%277%27 fill=%27%2315191f%27/%3E%3Ccircle cx=%279%27 cy=%279%27 r=%273%27 fill=%27%231c6fd1%27/%3E%3Ccircle cx=%2717%27 cy=%279%27 r=%273%27 fill=%27%2322884a%27/%3E%3Ccircle cx=%279%27 cy=%2717%27 r=%273%27 fill=%27%23d9590b%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: sticky top bar (brand · part nav · city switch), one routed page per part, each part = hero + question sections with chart cards. */
+  :root {
+    --bg: #f6f7f9; --surface: #ffffff; --fg: #15191f; --muted: #5b6573; --line: #e2e6ec; --soft: #eef1f5;
+    --weather: #1c6fd1; --mobility: #22884a; --pollution: #d9590b; --cross: #3d4654;
+    --paris: #6a46d8; --lyon: #d4366e; --lille: #0b8a9c; --france: #8a94a3;
+    --hot: #d9480f; --cold: #1971c2; --dry: #e0a21b; --rain: #2f6fd6;
+    --good: #2b8a3e; --bad: #c92a2a; --warn: #e67700;
+    --grid: #e7ebf0; --axis: #6b7584; --tip-bg: #15191f; --tip-fg: #f6f7f9;
+    --font-display: "Sora", "Inter", system-ui, sans-serif; --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --font-num: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --radius: 12px; --accent: var(--cross);
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0f1216; --surface: #171b21; --fg: #e8ecf1; --muted: #9aa4b2; --line: #2a3039; --soft: #1e232b;
+    --weather: #5ea4f0; --mobility: #4cc27a; --pollution: #f5874a; --cross: #aab4c3;
+    --paris: #9d84f0; --lyon: #f0709b; --lille: #3cc3d5; --france: #7d8796;
+    --hot: #ff8a50; --cold: #5aa7f0; --dry: #f2c14e; --rain: #6fa2ff;
+    --good: #51cf66; --bad: #ff6b6b; --warn: #ffa94d;
+    --grid: #232932; --axis: #8d97a5; --tip-bg: #e8ecf1; --tip-fg: #0f1216; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --bg: #0f1216; --surface: #171b21; --fg: #e8ecf1; --muted: #9aa4b2; --line: #2a3039; --soft: #1e232b;
+    --weather: #5ea4f0; --mobility: #4cc27a; --pollution: #f5874a; --cross: #aab4c3;
+    --paris: #9d84f0; --lyon: #f0709b; --lille: #3cc3d5; --france: #7d8796;
+    --hot: #ff8a50; --cold: #5aa7f0; --dry: #f2c14e; --rain: #6fa2ff;
+    --good: #51cf66; --bad: #ff6b6b; --warn: #ffa94d;
+    --grid: #232932; --axis: #8d97a5; --tip-bg: #e8ecf1; --tip-fg: #0f1216; color-scheme: dark; }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  html { overflow-x: hidden; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; }
+  .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+  /* top bar */
+  .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .top .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+  .brand svg { flex: none; }
+  .nav { display: flex; gap: 4px; overflow-x: auto; flex: 1 1 0; min-width: 0; scrollbar-width: none; }
+  @media (max-width: 760px) { .nav { order: 3; flex: 1 1 100%; } .top .wrap { gap: 8px 12px; } .brand { margin-right: auto; } }
+  .nav a { text-decoration: none; color: var(--muted); padding: 7px 12px; border-radius: 8px; white-space: nowrap; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .nav a:hover { color: var(--fg); background: var(--soft); }
+  .nav a[aria-current="page"] { color: var(--fg); background: var(--soft); }
+  .nav a .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .seg { display: inline-flex; background: var(--soft); border-radius: 9px; padding: 3px; gap: 2px; }
+  .seg button { border: 0; background: none; padding: 5px 12px; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+  .seg button .dot { width: 8px; height: 8px; border-radius: 50%; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* pages */
+  main { padding-block: 28px 64px; }
+  .page { display: flex; flex-direction: column; gap: 28px; }
+  .hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; align-items: end; padding-bottom: 8px; }
+  @media (max-width: 820px) { .hero { grid-template-columns: 1fr; } }
+  .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; color: var(--accent); }
+  .hero h1 { font-size: clamp(28px, 4vw, 42px); margin-top: 6px; }
+  .hero p { color: var(--muted); max-width: 62ch; margin-top: 10px; }
+  .meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 13px; color: var(--muted); }
+  .meta b { color: var(--fg); font-weight: 500; }
+  .qnav { display: flex; flex-wrap: wrap; gap: 8px; }
+  .qnav button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-size: 13px; color: var(--fg); }
+  .qnav button:hover { border-color: var(--accent); }
+  .qnav button b { color: var(--accent); margin-right: 6px; font-family: var(--font-num); }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+  .kpi .v { font-family: var(--font-display); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .kpi .l { font-size: 13px; color: var(--muted); }
+
+  .q { display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 90px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .q-head { display: flex; gap: 14px; align-items: baseline; }
+  .q-num { font-family: var(--font-num); color: var(--accent); font-size: 14px; flex: none; }
+  .q h2 { font-size: clamp(19px, 2.4vw, 24px); }
+  .answer { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; padding: 12px 16px; max-width: 900px; }
+  .answer b { font-weight: 600; }
+  .how { font-size: 13px; color: var(--muted); max-width: 900px; }
+  .how summary { cursor: pointer; color: var(--fg); font-weight: 500; }
+  .how p { margin-top: 6px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .card.wide { grid-column: 1 / -1; }
+  .card h3 { font-size: 15px; font-weight: 600; }
+  .card .sub { font-size: 12.5px; color: var(--muted); margin-top: -6px; }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+  .chart { position: relative; min-height: 200px; width: 100%; }
+  .chart svg { display: block; overflow: visible; }
+  .ax text { fill: var(--axis); font-size: 11px; font-family: var(--font-body); }
+  .ax line, .ax path { stroke: var(--line); }
+  .grid line { stroke: var(--grid); }
+  .lbl { fill: var(--fg); font-size: 11px; font-family: var(--font-num); }
+  .lbl-muted { fill: var(--muted); font-size: 11px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12.5px; color: var(--muted); }
+  .legend button { border: 0; background: none; padding: 2px 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12.5px; }
+  .legend button[aria-pressed="false"] { opacity: .4; text-decoration: line-through; }
+  .legend i, .legend .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
+  .legend .grad { width: 120px; height: 8px; border-radius: 4px; display: inline-block; }
+  .select { font: inherit; font-size: 13px; padding: 5px 28px 5px 10px; border: 1px solid var(--line); border-radius: 8px; background-color: var(--surface); color: var(--fg); }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; white-space: normal; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  td.num { font-family: var(--font-num); font-size: 12.5px; }
+  tr:hover td { background: var(--soft); }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; border: 1px solid currentColor; }
+  .pill.hot { color: var(--hot); } .pill.cold { color: var(--cold); } .pill.bad { color: var(--bad); } .pill.warn { color: var(--warn); }
+  .note { font-size: 12.5px; color: var(--muted); }
+
+  /* overview */
+  .parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .part { text-decoration: none; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 8px; border-top: 4px solid var(--c); transition: transform .15s ease; }
+  .part:hover { transform: translateY(-2px); border-color: var(--c); }
+  .part .tag { font-size: 12px; color: var(--c); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  .part h3 { font-size: 20px; }
+  .part p { color: var(--muted); font-size: 14px; }
+  .part .big { font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+  .part .go { margin-top: auto; font-size: 13px; color: var(--c); font-weight: 600; }
+  .flow { display: flex; gap: 8px; align-items: stretch; overflow-x: auto; padding-bottom: 4px; }
+  .flow .step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-width: 150px; flex: 1 0 150px; display: flex; flex-direction: column; gap: 4px; }
+  .flow .step b { font-family: var(--font-display); font-size: 14px; }
+  .flow .step span { font-size: 12.5px; color: var(--muted); }
+  .flow .arrow { align-self: center; color: var(--muted); flex: none; }
+  .stack { display: flex; flex-direction: column; gap: 6px; }
+  .stack span { font-size: 12px; padding: 3px 8px; border-radius: 6px; background: var(--soft); }
+  #tip { position: fixed; z-index: 50; pointer-events: none; background: var(--tip-bg); color: var(--tip-fg); border-radius: 8px; padding: 7px 10px; font-size: 12.5px; max-width: 280px; box-shadow: 0 6px 20px rgba(0,0,0,.25); font-variant-numeric: tabular-nums; }
+  #tip .tip-h { font-weight: 600; margin-bottom: 2px; }
+  footer { border-top: 1px solid var(--line); padding-block: 20px; color: var(--muted); font-size: 12.5px; }
+  .loading { color: var(--muted); padding: 40px 0; }
+  @media (prefers-reduced-motion: reduce) { .part { transition: none; } * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<style>
+  .filters { border-bottom: 1px solid var(--line); background: var(--bg); }
+  .filters .wrap { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding-block: 10px; font-size: 13px; color: var(--muted); }
+  .filters input[type="date"] { font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); }
+  .chips { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+  .chips button { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 3px 10px; font-size: 12.5px; cursor: pointer; }
+  .chips button[aria-pressed="true"] { color: var(--fg); border-color: var(--accent); }
+  .live { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; }
+  .live i { width: 8px; height: 8px; border-radius: 50%; background: var(--good); display: inline-block; }
+  .live.busy i { background: var(--warn); }
+  .live.err i { background: var(--bad); }
+  .btn { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 8px; padding: 4px 10px; font-size: 12.5px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font-size: 12.5px; color: var(--muted); }
+  .controls label { display: inline-flex; align-items: center; gap: 6px; }
+  .controls input[type="range"] { width: 110px; accent-color: var(--accent); }
+  .controls input[type="number"] { width: 64px; font: inherit; font-size: 12.5px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--fg); }
+  .controls output { font-family: var(--font-num); color: var(--fg); min-width: 2.5em; }
+  .sqlbox { font-size: 12px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 6px; margin-top: auto; }
+  .sqlbox summary { cursor: pointer; list-style: none; display: inline-flex; gap: 8px; align-items: center; }
+  .sqlbox summary::-webkit-details-marker { display: none; }
+  .sqlbox summary b { font-family: var(--font-num); font-weight: 500; color: var(--accent); }
+  .sqlbox pre { margin: 6px 0 0; padding: 10px; background: var(--soft); border-radius: 8px; overflow-x: auto; font-family: var(--font-num); font-size: 11.5px; line-height: 1.45; color: var(--fg); white-space: pre; }
+  .chart.loading { opacity: .45; transition: opacity .2s; }
+  .err-msg { color: var(--bad); font-size: 13px; padding: 16px 0; }
+  .drawer { position: fixed; right: 0; top: 0; bottom: 0; width: min(440px, 100%); background: var(--surface); border-left: 1px solid var(--line); z-index: 20; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 16px 16px; overflow-y: auto; box-shadow: -10px 0 30px rgba(0,0,0,.2); display: flex; flex-direction: column; gap: 12px; }
+  .drawer h3 { font-size: 18px; }
+  .drawer .close { align-self: flex-end; }
+  .section-title { font-size: clamp(19px, 2.4vw, 24px); }
+  .tbl-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .tbl { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; text-align: left; font: inherit; color: var(--fg); }
+  .tbl[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .tbl b { font-family: var(--font-num); font-size: 13px; }
+  .tbl .n { font-family: var(--font-display); font-size: 22px; font-weight: 600; }
+  .tbl .cols { font-size: 11.5px; color: var(--muted); }
+  .preview td, .preview th { font-size: 12px; white-space: nowrap; }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#overview" aria-label="UrbanHub overview">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="7" fill="var(--fg)"/><circle cx="9" cy="9" r="2.6" fill="var(--weather)"/><circle cx="17" cy="9" r="2.6" fill="var(--mobility)"/><circle cx="9" cy="17" r="2.6" fill="var(--pollution)"/><circle cx="17" cy="17" r="2.6" fill="var(--bg)"/></svg>
+      UrbanHub
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#weather"><span class="dot" style="background:var(--weather)"></span>1 · Weather</a>
+      <a href="#mobility"><span class="dot" style="background:var(--mobility)"></span>2 · Mobility</a>
+      <a href="#pollution"><span class="dot" style="background:var(--pollution)"></span>3 · Pollution</a>
+      <a href="#cross"><span class="dot" style="background:var(--cross)"></span>4 · Cross analysis</a>
+      <a href="#data">Data</a>
+    </nav>
+    <div class="seg" role="group" aria-label="City" id="citySeg">
+      <button type="button" data-city="paris" aria-pressed="true"><span class="dot" style="background:var(--paris)"></span>Paris</button>
+      <button type="button" data-city="lyon" aria-pressed="false"><span class="dot" style="background:var(--lyon)"></span>Lyon</button>
+      <button type="button" data-city="lille" aria-pressed="false"><span class="dot" style="background:var(--lille)"></span>Lille</button>
+    </div>
+  </div>
+  <div class="filters">
+    <div class="wrap">
+      <span>Period</span>
+      <input type="date" id="dStart" aria-label="From" min="2024-01-01"> → <input type="date" id="dEnd" aria-label="To" min="2024-01-01">
+      <span class="chips" id="presets">
+        <button type="button" data-p="all">All</button><button type="button" data-p="2024">2024</button><button type="button" data-p="2025">2025</button><button type="button" data-p="2026">2026</button><button type="button" data-p="90">Last 90 days</button>
+      </span>
+      <button type="button" class="btn" id="refresh" title="Run every query again on the latest data">Refresh data</button>
+      <span class="live" id="live"><i></i><span id="liveTxt">Connecting to the database…</span></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <p class="loading" id="loading">Connecting to the UrbanHub API…</p>
+
+  <!-- ===================== OVERVIEW ===================== -->
+  <section class="page" id="page-overview" hidden style="--accent: var(--cross)">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">IPSSI Paris · Data Lake project</div>
+        <h1>A digital twin of Paris, Lyon and Lille</h1>
+        <p>UrbanHub collects weather, bike-share and air-quality data for three French cities, stores it in a Data Lake, and joins it hour by hour. Every chart on this site is a live SQL query on the lake: change the city or the period and the database answers again.</p>
+      </div>
+      <div class="meta" id="ov-meta"></div>
+    </div>
+    <div class="parts" id="ov-parts"></div>
+    <div class="q" style="border-top:0">
+      <div class="q-head"><h2>How the data flows</h2></div>
+      <div class="flow" aria-label="Pipeline">
+        <div class="step"><b>Sources</b><div class="stack"><span style="color:var(--weather)">NOAA + Open-Meteo</span><span style="color:var(--mobility)">CityBikes · Grand Lyon · ilévia</span><span style="color:var(--pollution)">OpenAQ API v3</span></div></div>
+        <div class="arrow">→</div>
+        <div class="step"><b>raw</b><span>Data as received: CSV, JSON, Parquet, split by date</span></div>
+        <div class="arrow">→</div>
+        <div class="step"><b>clean</b><span>Cleaned and typed, Parquet, UTC times, units fixed</span></div>
+        <div class="arrow">→</div>
+        <div class="step"><b>curated</b><span>One row per city and hour: the shared key</span></div>
+        <div class="arrow">→</div>
+        <div class="step"><b>This site</b><span>FastAPI + DuckDB run SQL on the curated tables at each click</span></div>
+      </div>
+    </div>
+    <div class="q">
+      <div class="q-head"><h2>What data we have, month by month</h2></div>
+      <p class="note">Each cell is one month; the darker, the more days with data. Live from <code>/api/coverage</code>.</p>
+      <div class="card wide"><div class="chart" id="ov-coverage"></div><div class="legend" id="ov-coverage-legend"></div><div class="sqlbox" id="ov-coverage-sql"></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== PART 1 · WEATHER ===================== -->
+  <section class="page" id="page-weather" hidden style="--accent: var(--weather)">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Part 1 · Batch flow · Developer 1</div>
+        <h1>Urban weather</h1>
+        <p>Hourly weather per city from the curated table <code>weather_city_hourly</code>. Four questions: abnormal periods, visibility, seasons and extreme days. Every threshold below is sent to the database.</p>
+      </div>
+      <div class="meta" id="w-meta"></div>
+    </div>
+    <div class="qnav" data-for="weather"></div>
+    <div class="kpis" id="w-kpis"></div>
+
+    <div class="q" id="wq1">
+      <div class="q-head"><span class="q-num">Q1</span><h2>Can we spot abnormal weather periods?</h2></div>
+      <div class="answer" id="w-a1"></div>
+      <div class="controls">
+        <label>Sensitivity (z-score) <input type="range" id="w-z" min="1" max="3" step="0.1" value="1.5"><output id="w-z-o">1.5</output></label>
+        <label>Minimum length <input type="range" id="w-min" min="1" max="7" step="1" value="3"><output id="w-min-o">3</output> days</label>
+      </div>
+      <div class="cards">
+        <div class="card wide">
+          <div class="card-head"><div><h3>Daily temperature and abnormal periods</h3><p class="sub" id="w-temp-sub"></p></div>
+            <div class="legend"><span><i style="background:var(--hot);opacity:.35"></i>Hot period</span><span><i style="background:var(--cold);opacity:.35"></i>Cold period</span><span><i style="background:var(--accent)"></i>Daily mean</span></div></div>
+          <div class="chart" id="w-temp"></div><div class="sqlbox" id="w-temp-sql"></div>
+        </div>
+        <div class="card wide"><h3>All abnormal periods, three cities</h3><p class="sub">Hover a bar for its dates and size</p><div class="chart" id="w-timeline"></div><div class="sqlbox" id="w-timeline-sql"></div></div>
+      </div>
+      <details class="how"><summary>How it's computed</summary><p>For each city and calendar month, the database computes the normal daily temperature and its standard deviation. A day further than the chosen z-score is abnormal, and consecutive abnormal days of the same kind form a period (a "gaps and islands" query).</p></details>
+    </div>
+
+    <div class="q" id="wq2">
+      <div class="q-head"><span class="q-num">Q2</span><h2>Is there a link between weather and visibility?</h2></div>
+      <div class="answer" id="w-a2"></div>
+      <div class="cards">
+        <div class="card"><h3>Visibility by rain</h3><p class="sub">Average visibility (km), by rain in the hour (mm)</p><div class="chart" id="w-vrain"></div></div>
+        <div class="card"><h3>Visibility by wind</h3><p class="sub">Average visibility (km) and fog hours (%), by wind speed (m/s)</p><div class="chart" id="w-vwind"></div><div class="sqlbox" id="w-vis-sql"></div></div>
+      </div>
+      <details class="how"><summary>How it's computed</summary><p>Hourly rows where visibility is known, grouped by rain and wind bands. Fog means visibility under 1 km. Visibility is only available in part of the weather table, so the answer says how many hours it is based on.</p></details>
+    </div>
+
+    <div class="q" id="wq3">
+      <div class="q-head"><span class="q-num">Q3</span><h2>How does temperature change through the seasons?</h2></div>
+      <div class="answer" id="w-a3"></div>
+      <div class="cards">
+        <div class="card wide"><div class="card-head"><div><h3>Monthly mean temperature</h3><p class="sub">°C · click a city to hide it</p></div><div class="legend" id="w-month-legend"></div></div><div class="chart" id="w-month"></div><div class="sqlbox" id="w-month-sql"></div></div>
+        <div class="card"><h3>Average by season</h3><p class="sub">°C</p><div class="legend" id="w-season-legend"></div><div class="chart" id="w-season"></div></div>
+        <div class="card"><h3>Summer–winter gap</h3><p class="sub">Warmest calendar month minus coldest, °C</p><div class="chart" id="w-range"></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="wq4">
+      <div class="q-head"><span class="q-num">Q4</span><h2>Which days had extreme weather?</h2></div>
+      <div class="answer" id="w-a4"></div>
+      <div class="controls">
+        <label>Heat ≥ <input type="number" id="w-heat" value="33" step="1"> °C</label>
+        <label>Cold ≤ <input type="number" id="w-cold" value="-5" step="1"> °C</label>
+        <label>Rain ≥ <input type="number" id="w-rain" value="20" step="1"> mm/day</label>
+        <label>Wind ≥ <input type="number" id="w-wind" value="12" step="1"> m/s</label>
+      </div>
+      <div class="cards">
+        <div class="card wide"><div class="card-head"><div><h3>Extreme days over time</h3><p class="sub">Each dot is one day · hover for values</p></div><div class="legend" id="w-ext-legend"></div></div><div class="chart" id="w-ext"></div><div class="sqlbox" id="w-ext-sql"></div></div>
+        <div class="card"><h3>Extreme days by type</h3><p class="sub">Number of days, per city</p><div class="chart" id="w-ext-bars"></div></div>
+        <div class="card"><h3>Records</h3><p class="sub" id="w-rec-sub"></p><div class="tablewrap"><table><thead><tr><th>Record</th><th>Value</th><th>Date</th></tr></thead><tbody id="w-records"></tbody></table></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART 2 · MOBILITY ===================== -->
+  <section class="page" id="page-mobility" hidden style="--accent: var(--mobility)">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Part 2 · Streaming flow · Developer 2</div>
+        <h1>Bike-share mobility</h1>
+        <p>Every station of Vélib' (Paris), Vélo'v (Lyon) and V'Lille, hour by hour, from the CityBikes history, the Grand Lyon Vélo'v history and the live collector, plus every V'Lille trip published by ilévia. Click any station on a map or in a table to open its detail.</p>
+      </div>
+      <div class="meta" id="m-meta"></div>
+    </div>
+    <div class="qnav" data-for="mobility"></div>
+    <div class="kpis" id="m-kpis"></div>
+
+    <div class="q" id="mq1">
+      <div class="q-head"><span class="q-num">Q1</span><h2>Which stations are used the most?</h2></div>
+      <div class="answer" id="m-a1"></div>
+      <div class="cards">
+        <div class="card"><h3>Top 15 stations</h3><p class="sub">Bike movements per day (a bike taken or returned) · click a bar</p><div class="chart" id="m-top"></div></div>
+        <div class="card"><h3>Where the busiest stations are</h3><p class="sub">Dot size = movements per day · top 15 in colour · click a station</p><div class="chart" id="m-topmap"></div><div class="sqlbox" id="m-stations-sql"></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="mq2">
+      <div class="q-head"><span class="q-num">Q2</span><h2>Where is bike supply too low?</h2></div>
+      <div class="answer" id="m-a2"></div>
+      <div class="cards">
+        <div class="card wide">
+          <div class="card-head"><div><h3>Station map</h3><p class="sub">Colour shows the chosen measure · click a station for its detail</p></div>
+            <label class="note">Show <select class="select" id="m-map-metric"><option value="empty_pct">Time empty (%)</option><option value="full_pct">Time full (%)</option><option value="per_day">Movements per day</option><option value="cap">Docks</option></select></label></div>
+          <div class="legend" id="m-map-legend"></div><div class="chart" id="m-map"></div>
+        </div>
+        <div class="card wide"><h3>Areas most often without bikes</h3><p class="sub">About 1 km squares with 2+ active stations, ranked by the share of time their stations are empty</p><div class="tablewrap"><table><thead><tr><th>Area (a station in it)</th><th>Stations</th><th>Time empty</th><th>Movements / day</th></tr></thead><tbody id="m-zones"></tbody></table></div></div>
+        <div class="card"><h3>Empty stations through the day</h3><p class="sub">% of stations empty, by hour · Paris time</p><div class="chart" id="m-emptyhour"></div></div>
+        <div class="card"><h3>How full are stations?</h3><p class="sub">Share of station-hours by fill rate</p><div class="chart" id="m-occ"></div><div class="sqlbox" id="m-occ-sql"></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="mq3">
+      <div class="q-head"><span class="q-num">Q3</span><h2>When are the daily peaks?</h2></div>
+      <div class="answer" id="m-a3"></div>
+      <div class="cards">
+        <div class="card"><div class="card-head"><div><h3>Movements by hour</h3><p class="sub">Average per hour · Paris time</p></div><div class="legend" id="m-hour-legend"></div></div><div class="chart" id="m-hours"></div><div class="sqlbox" id="m-hours-sql"></div></div>
+        <div class="card"><h3>Week heatmap</h3><p class="sub">Average movements per hour, by weekday and hour</p><div class="chart" id="m-heat"></div><div class="sqlbox" id="m-heat-sql"></div></div>
+        <div class="card"><h3>Movements by day of the week</h3><p class="sub">Average per full day</p><div class="chart" id="m-dow"></div></div>
+        <div class="card"><h3>Movements per day over time</h3><p class="sub">Full days only · gaps are periods no source published</p><div class="chart" id="m-daily"></div><div class="sqlbox" id="m-daily-sql"></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="mq4">
+      <div class="q-head"><span class="q-num">Q4</span><h2>Which areas empty or fill up during the day?</h2></div>
+      <div class="answer" id="m-a4"></div>
+      <div class="cards">
+        <div class="card wide"><h3>Night vs midday fill rate</h3><p class="sub">Change from the night (1–5 am) to midday (11 am–3 pm), weekdays · purple fills up during the day, orange empties</p><div class="legend" id="m-swing-legend"></div><div class="chart" id="m-swing"></div></div>
+        <div class="card"><h3>Fill up during the day</h3><p class="sub">Work and study areas</p><div class="tablewrap"><table><thead><tr><th>Station</th><th>Night</th><th>Midday</th></tr></thead><tbody id="m-fill"></tbody></table></div></div>
+        <div class="card"><h3>Empty during the day</h3><p class="sub">Residential areas</p><div class="tablewrap"><table><thead><tr><th>Station</th><th>Night</th><th>Midday</th></tr></thead><tbody id="m-drain"></tbody></table></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="mq5">
+      <div class="q-head"><span class="q-num">Q5</span><h2>Which stations need rebalancing?</h2></div>
+      <div class="answer" id="m-a5"></div>
+      <div class="cards">
+        <div class="card wide"><h3>Stations most often empty or full</h3><p class="sub">Active stations (5+ movements a day) · click a column to sort, a row for its detail</p><div class="tablewrap"><table id="m-crit-table"><thead><tr><th data-k="name">Station</th><th data-k="crit">Empty or full</th><th data-k="empty_pct">Empty</th><th data-k="full_pct">Full</th><th data-k="per_day">Movements / day</th><th data-k="cap">Docks</th><th>Action</th></tr></thead><tbody id="m-crit"></tbody></table></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="mq6">
+      <div class="q-head"><span class="q-num">+</span><h2>The three networks compared</h2></div>
+      <div class="answer" id="m-a6"></div>
+      <div class="cards">
+        <div class="card"><div class="card-head"><div><h3>Use per station</h3><p class="sub">Movements per station per day, monthly average</p></div><div class="legend" id="m-cmp-legend"></div></div><div class="chart" id="m-cmp"></div><div class="sqlbox" id="m-cmp-sql"></div></div>
+        <div class="card"><h3>Network size</h3><p class="sub">Stations reporting, monthly average</p><div class="chart" id="m-size"></div></div>
+        <div class="card"><h3>Empty stations by month</h3><p class="sub">% of stations empty, monthly average</p><div class="chart" id="m-emptym"></div></div>
+        <div class="card"><h3>Station size and use</h3><p class="sub">One dot per station · docks (across) vs movements per day (up)</p><div class="chart" id="m-sizeuse"></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="mq7">
+      <div class="q-head"><span class="q-num">+</span><h2>V'Lille trips: where people actually ride (Lille)</h2></div>
+      <div class="answer" id="m-a7"></div>
+      <div class="kpis" id="t-kpis"></div>
+      <div class="cards">
+        <div class="card wide"><div class="card-head"><div><h3>Busiest routes</h3><p class="sub">Top routes between two different stations · line width = trips · hover for details</p></div>
+          <label class="note">Routes <select class="select" id="t-top"><option>20</option><option selected>40</option><option>80</option><option>150</option></select></label></div>
+          <div class="chart" id="t-flows"></div><div class="sqlbox" id="t-flows-sql"></div></div>
+        <div class="card"><div class="card-head"><div><h3>Trips by hour</h3><p class="sub">Average trips per hour · Paris time</p></div><div class="legend" id="t-hour-legend"></div></div><div class="chart" id="t-hours"></div></div>
+        <div class="card"><h3>Trip duration</h3><p class="sub">Number of trips by duration (minutes) · 60 = one hour or more</p><div class="chart" id="t-dur"></div></div>
+        <div class="card"><h3>Trips per day</h3><p class="sub">All of Lille's network</p><div class="chart" id="t-daily"></div></div>
+        <div class="card"><h3>Stations that gain or lose bikes</h3><p class="sub">Arrivals minus departures · purple gains, orange loses</p><div class="legend" id="t-net-legend"></div><div class="chart" id="t-net"></div></div>
+      </div>
+      <details class="how"><summary>Where these trips come from</summary><p>ilévia publishes every V'Lille rental since April 2025 (start and end time, departure and arrival station) under the Licence Ouverte. Station positions come from the CityBikes V'Lille history (same station numbers).</p></details>
+    </div>
+  </section>
+
+  <!-- ===================== PART 3 · POLLUTION ===================== -->
+  <section class="page" id="page-pollution" hidden style="--accent: var(--pollution)">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Part 3 · IoT flow · Developer 3</div>
+        <h1>Air quality</h1>
+        <p>Official EEA stations from OpenAQ: PM2.5, PM10, NO₂ and O₃, compared with the WHO 2021 guidelines. Live from <code>pollution_city_hourly</code> and the clean <code>measurements</code> table.</p>
+      </div>
+      <div class="meta" id="p-meta"></div>
+    </div>
+    <div class="qnav" data-for="pollution"></div>
+    <div class="kpis" id="p-kpis"></div>
+
+    <div class="q" id="pq1">
+      <div class="q-head"><span class="q-num">Q1</span><h2>Which areas are the most polluted?</h2></div>
+      <div class="answer" id="p-a1"></div>
+      <div class="cards">
+        <div class="card"><div class="card-head"><div><h3>Stations on the map</h3><p class="sub">Average concentration over the period</p></div>
+          <select class="select" id="p-map-pol" aria-label="Pollutant"><option value="no2">NO₂</option><option value="pm25">PM2.5</option><option value="pm10">PM10</option></select></div>
+          <div class="legend" id="p-map-legend"></div><div class="chart" id="p-map"></div><div class="sqlbox" id="p-st-sql"></div></div>
+        <div class="card"><h3>Stations ranked</h3><p class="sub" id="p-rank-sub"></p><div class="chart" id="p-rank"></div></div>
+        <div class="card wide"><h3>How far above the WHO yearly guideline?</h3><p class="sub">City average of its stations ÷ WHO guideline · 1 = at the guideline</p><div class="chart" id="p-who"></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="pq2">
+      <div class="q-head"><span class="q-num">Q2</span><h2>How does pollution change through the day?</h2></div>
+      <div class="answer" id="p-a2"></div>
+      <div class="cards">
+        <div class="card wide"><div class="card-head"><div><h3>Average by hour</h3><p class="sub">µg/m³ · Paris time · weekdays vs weekends</p></div>
+          <select class="select" id="p-hour-pol" aria-label="Pollutant"><option value="no2">NO₂</option><option value="pm25">PM2.5</option><option value="pm10">PM10</option><option value="o3">O₃</option></select></div>
+          <div class="legend" id="p-hour-legend"></div><div class="chart" id="p-hours"></div><div class="sqlbox" id="p-hours-sql"></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="pq3">
+      <div class="q-head"><span class="q-num">Q3</span><h2>Which pollutants dominate?</h2></div>
+      <div class="answer" id="p-a3"></div>
+      <div class="cards">
+        <div class="card"><h3>Main pollutant of the day</h3><p class="sub">Share of days where each pollutant is highest against its WHO daily guideline</p><div class="legend" id="p-dom-legend"></div><div class="chart" id="p-dom"></div><div class="sqlbox" id="p-dom-sql"></div></div>
+        <div class="card"><h3>Days above the WHO daily guideline</h3><p class="sub">% of days</p><div class="legend" id="p-above-legend"></div><div class="chart" id="p-above"></div></div>
+        <div class="card wide"><div class="card-head"><div><h3>Seasons</h3><p class="sub">Monthly mean, µg/m³ · click a pollutant to hide it</p></div><div class="legend" id="p-month-legend"></div></div><div class="chart" id="p-month"></div><div class="sqlbox" id="p-month-sql"></div></div>
+      </div>
+    </div>
+
+    <div class="q" id="pq4">
+      <div class="q-head"><span class="q-num">Q4</span><h2>Can we detect pollution episodes?</h2></div>
+      <div class="answer" id="p-a4"></div>
+      <div class="controls">
+        <label>Pollutant <select class="select" id="p-ep-pol"><option value="pm25">PM2.5</option><option value="pm10">PM10</option><option value="no2">NO₂</option><option value="o3">O₃</option></select></label>
+        <label>z-score above <input type="range" id="p-z" min="1.5" max="5" step="0.1" value="3"><output id="p-z-o">3</output></label>
+        <label>Compared with the previous <input type="range" id="p-win" min="7" max="90" step="1" value="30"><output id="p-win-o">30</output> days</label>
+      </div>
+      <div class="cards">
+        <div class="card wide"><h3>Daily level and detected episodes</h3><p class="sub" id="p-ep-sub"></p><div class="chart" id="p-ep"></div><div class="sqlbox" id="p-ep-sql"></div></div>
+        <div class="card wide"><h3>Strongest episodes</h3><p class="sub">Highest z-scores for this pollutant and city</p><div class="tablewrap"><table><thead><tr><th>Date</th><th>Daily mean</th><th>vs WHO daily</th><th>z-score</th></tr></thead><tbody id="p-ep-table"></tbody></table></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART 4 · CROSS ===================== -->
+  <section class="page" id="page-cross" hidden style="--accent: var(--cross)">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Part 4 · Cross analysis · all developers</div>
+        <h1>Weather × bikes × air</h1>
+        <p>The three curated tables joined on city and day by one SQL query. Does the weather change how people ride, and the air they breathe?</p>
+      </div>
+      <div class="meta"><span>Join key</span><b>city + date</b><span>Period</span><b id="x-period">—</b><span>Days compared</span><b id="x-days">—</b></div>
+    </div>
+    <div class="qnav" data-for="cross"></div>
+    <div class="q" id="xq1">
+      <div class="q-head"><span class="q-num">Q1</span><h2>Do people ride less when it rains?</h2></div>
+      <div class="answer" id="x-a1"></div>
+      <div class="cards">
+        <div class="card"><h3>Movements per day by rain</h3><p class="sub">Average, weekdays only</p><div class="legend" id="x-rain-legend"></div><div class="chart" id="x-rain"></div><div class="sqlbox" id="x-sql"></div></div>
+        <div class="card"><h3>Movements by temperature</h3><p class="sub">Average per weekday as % of the city's average, by 3 °C band</p><div class="legend" id="x-temp-legend"></div><div class="chart" id="x-temp"></div></div>
+      </div>
+    </div>
+    <div class="q" id="xq2">
+      <div class="q-head"><span class="q-num">Q2</span><h2>Does weather change air quality?</h2></div>
+      <div class="answer" id="x-a2"></div>
+      <div class="cards">
+        <div class="card"><h3>NO₂ by wind</h3><p class="sub">µg/m³ · by daily mean wind band</p><div class="chart" id="x-wind"></div></div>
+        <div class="card"><h3>Weekday vs weekend NO₂</h3><p class="sub">µg/m³</p><div class="chart" id="x-weekend"></div></div>
+      </div>
+    </div>
+    <div class="q" id="xq3">
+      <div class="q-head"><span class="q-num">Q3</span><h2>Explore any pair of measures</h2></div>
+      <div class="answer" id="x-a3"></div>
+      <div class="cards">
+        <div class="card"><div class="card-head"><h3>Scatter explorer</h3><div class="note"><select class="select" id="x-xsel" aria-label="Across"></select> vs <select class="select" id="x-ysel" aria-label="Up"></select></div></div>
+          <p class="sub">One dot per day · hover for the date</p><div class="chart" id="x-scatter"></div></div>
+        <div class="card"><h3>Correlation table</h3><p class="sub">Pearson correlation (−1 to +1) · click a cell to plot it</p><div class="chart" id="x-corr"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DATA ===================== -->
+  <section class="page" id="page-data" hidden style="--accent: var(--cross)">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">The database</div>
+        <h1>Tables behind the site</h1>
+        <p>The web app reads these tables with DuckDB, straight from the Data Lake's Parquet files (or from PostgreSQL with <code>WEBAPP_BACKEND=postgres</code>). New files written by the collectors and Spark jobs show up at the next query.</p>
+      </div>
+      <div class="meta" id="d-meta"></div>
+    </div>
+    <div class="tbl-list" id="d-tables"></div>
+    <div class="card wide"><div class="card-head"><div><h3 id="d-prev-title">Latest rows</h3><p class="sub">The 20 most recent rows, Paris time</p></div><a class="btn" href="/docs" target="_blank" rel="noopener">API documentation ↗</a></div>
+      <div class="tablewrap"><table class="preview"><thead id="d-prev-head"></thead><tbody id="d-prev-body"></tbody></table></div><div class="sqlbox" id="d-prev-sql"></div></div>
+  </section>
+</main>
+
+<aside class="drawer" id="drawer" hidden aria-label="Station detail">
+  <button type="button" class="btn close" id="drawerClose">Close ✕</button>
+  <div><div class="eyebrow" style="color:var(--mobility)">Station</div><h3 id="dr-name">—</h3><p class="note" id="dr-sub"></p></div>
+  <div class="kpis" id="dr-kpis"></div>
+  <div><h3 style="font-size:14px">Fill rate through the day</h3><p class="note">% of docks with a bike · Paris time</p><div class="legend" id="dr-legend"></div><div class="chart" id="dr-prof"></div></div>
+  <div><h3 style="font-size:14px">Movements per day</h3><div class="chart" id="dr-daily"></div></div>
+  <div class="sqlbox" id="dr-sql"></div>
+</aside>
+
+<footer><div class="wrap">UrbanHub · IPSSI Paris Data Lake project · Bike-share data by CityBikes contributors and available from https://data.citybik.es · Vélo'v history: Métropole de Lyon · V'Lille trips: ilévia / MEL (Licence Ouverte) · Air quality: OpenAQ (EEA) · Weather: NOAA and Open-Meteo.</div></footer>
+<div id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
