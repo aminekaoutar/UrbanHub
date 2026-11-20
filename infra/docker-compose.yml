@@ -35,7 +35,10 @@ x-spark-env: &spark-env
   POSTGRES_USER: ${POSTGRES_USER:-urbanhub}
   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-urbanhub123}
   SPARK_MASTER_URL: spark://spark-master:7077
-  MINIO_ENABLED: "true"      # dans Docker, les jobs lisent / écrivent dans MinIO (s3a://), pas sur le disque local
+  MINIO_ENABLED: "true"      # common/config.py : dans Docker, on lit / écrit dans MinIO (s3a://), pas dans data/
+  # L'utilisateur "spark" de l'image a pour dossier personnel /nonexistent : Spark ne pourrait pas
+  # y ranger les fichiers Java qu'il télécharge (spark.jars.packages dans common/spark.py).
+  JAVA_TOOL_OPTIONS: "-Duser.home=/home/spark"
   TZ: UTC
 
 services:
