@@ -1,0 +1,273 @@
+table_name: v_mobility_hourly
+main_dttm_col: timestamp
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: 600
+catalog: urbanhub
+schema: public
+sql: "SELECT city, timestamp, bikes_available, free_slots, capacity, occupancy_rate,\
+  \ usage_events,\n       nb_stations, nb_empty_stations, nb_full_stations,\n    \
+  \   nb_empty_stations::float / NULLIF(nb_stations, 0) AS pct_empty,\n       nb_full_stations::float\
+  \ / NULLIF(nb_stations, 0) AS pct_full,\n       usage_events::float / NULLIF(nb_stations,\
+  \ 0) AS usage_per_station,\n       \n    to_char(local, 'HH24') || 'h' AS heure,\n\
+  \    extract(hour FROM local)::int AS hour_local,\n    extract(isodow FROM local)::int\
+  \ || ' \xB7 ' ||\n        (ARRAY['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'])[extract(isodow\
+  \ FROM local)::int] AS jour,\n    CASE WHEN extract(isodow FROM local) >= 6 THEN\
+  \ 'Week-end' ELSE 'Semaine' END AS type_jour,\n    to_char(local, 'MM') || ' \xB7\
+  \ ' ||\n        (ARRAY['Janv.','F\xE9vr.','Mars','Avr.','Mai','Juin','Juil.','Ao\xFB\
+  t','Sept.','Oct.','Nov.','D\xE9c.'])[extract(month FROM local)::int] AS mois,\n\
+  \    CASE WHEN extract(month FROM local) IN (12, 1, 2) THEN '1 \xB7 Hiver'\n   \
+  \      WHEN extract(month FROM local) IN (3, 4, 5) THEN '2 \xB7 Printemps'\n   \
+  \      WHEN extract(month FROM local) IN (6, 7, 8) THEN '3 \xB7 \xC9t\xE9'\n   \
+  \      ELSE '4 \xB7 Automne' END AS saison\nFROM (SELECT *, ((timestamp AT TIME\
+  \ ZONE 'UTC') AT TIME ZONE 'Europe/Paris') AS local FROM mobility_city_hourly) m"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 163ed8ef-3221-4c8d-b241-932f01318927
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: usage_per_station
+  verbose_name: Mouvements / station / h
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pct_empty
+  verbose_name: Part du temps vide
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pct_full
+  verbose_name: Part du temps pleine
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: occupancy_rate
+  verbose_name: Taux de remplissage
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: usage_events
+  verbose_name: "Mouvements de v\xE9los"
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: type_jour
+  verbose_name: Type de jour
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: heure
+  verbose_name: Heure (Paris)
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: bikes_available
+  verbose_name: "V\xE9los disponibles"
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: timestamp
+  verbose_name: Date
+  is_dttm: true
+  is_active: true
+  type: DATETIME
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: capacity
+  verbose_name: "Capacit\xE9"
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: nb_stations
+  verbose_name: Stations
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: jour
+  verbose_name: Jour
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: mois
+  verbose_name: Mois
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: saison
+  verbose_name: Saison
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: city
+  verbose_name: Ville
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: nb_empty_stations
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: nb_full_stations
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: hour_local
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: free_slots
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 18212977-06e9-4a8c-b8e0-2703db8e347e

@@ -1,0 +1,44 @@
+slice_name: Mouvements par jour de la semaine et par heure
+description: null
+certified_by: null
+certification_details: null
+viz_type: heatmap_v2
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: heatmap_v2
+  datasource: 10__table
+  x_axis: heure
+  groupby: jour
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(usage_events)
+    label: mouvements / h
+    optionName: metric_703e9d2b
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  linear_color_scheme: oranges
+  normalize_across: heatmap
+  legend_type: continuous
+  show_legend: true
+  show_values: false
+  show_percentage: false
+  sort_x_axis: alpha_asc
+  sort_y_axis: alpha_asc
+  y_axis_format: ',.0f'
+  xscale_interval: 3
+  yscale_interval: 1
+  left_margin: auto
+  bottom_margin: auto
+  value_bounds:
+  - null
+  - null
+query_context: null
+cache_timeout: null
+uuid: 913d471b-f7ef-47df-aaa6-a22a60474a57
+version: 1.0.0
+dataset_uuid: 163ed8ef-3221-4c8d-b241-932f01318927

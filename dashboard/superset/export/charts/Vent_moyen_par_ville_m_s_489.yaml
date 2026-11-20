@@ -1,0 +1,46 @@
+slice_name: Vent moyen par ville (m/s)
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_line
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_line
+  datasource: 1__table
+  x_axis: timestamp
+  metrics:
+  - expressionType: SQL
+    sqlExpression: AVG(wind_speed)
+    label: Vent (m/s)
+    optionName: metric_cdf3ea4f
+  groupby:
+  - city
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .1f
+  y_axis_title: m/s
+  order_desc: true
+  time_grain_sqla: P1W
+query_context: null
+cache_timeout: null
+uuid: 76e87c1a-1531-497d-8819-028229c4e12a
+version: 1.0.0
+dataset_uuid: d37324c8-9242-4a55-8ea0-501a9750d216

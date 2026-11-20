@@ -1,0 +1,84 @@
+table_name: v_correlations
+main_dttm_col: null
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: 600
+catalog: urbanhub
+schema: public
+sql: "WITH d AS (\nSELECT city, date_trunc('day', local) AS timestamp,\n       avg(temperature)\
+  \ AS temperature, max(temperature) AS tmax, min(temperature) AS tmin,\n       sum(precipitation)\
+  \ AS precipitation, avg(wind_speed) AS wind_speed,\n       avg(usage_events) AS\
+  \ usage_per_hour, avg(usage_events::float / NULLIF(nb_bike_stations, 0)) AS usage_per_station,\n\
+  \       avg(occupancy_rate) AS occupancy_rate,\n       avg(bikes_available) AS bikes_available,\n\
+  \       avg(pm25) AS pm25, avg(pm10) AS pm10, avg(no2) AS no2, avg(o3) AS o3,\n\
+  \       count(usage_events) AS bike_hours,\n       CASE WHEN extract(isodow FROM\
+  \ date_trunc('day', local)) >= 6 THEN 'Week-end' ELSE 'Semaine' END AS type_jour\n\
+  FROM (SELECT *, ((timestamp AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Paris') AS\
+  \ local FROM urban_city_hourly) u\nGROUP BY 1, 2\n),\nc AS (\n    SELECT city,\n\
+  \           corr(temperature, usage_per_hour) AS c1, corr(precipitation, usage_per_hour)\
+  \ AS c2,\n           corr(wind_speed, usage_per_hour) AS c3, corr(wind_speed, pm25)\
+  \ AS c4,\n           corr(wind_speed, no2) AS c5, corr(temperature, o3) AS c6,\n\
+  \           corr(precipitation, pm10) AS c7, corr(usage_per_hour, no2) AS c8\n \
+  \   FROM d GROUP BY city\n)\nSELECT c.city, v.relation, v.r\nFROM c CROSS JOIN LATERAL\
+  \ (VALUES\n    ('Temp\xE9rature \u2194 usage v\xE9los', c1), ('Pluie \u2194 usage\
+  \ v\xE9los', c2), ('Vent \u2194 usage v\xE9los', c3),\n    ('Vent \u2194 PM2.5',\
+  \ c4), ('Vent \u2194 NO2', c5), ('Temp\xE9rature \u2194 O3', c6),\n    ('Pluie \u2194\
+  \ PM10', c7), ('Usage v\xE9los \u2194 NO2', c8)) AS v(relation, r)"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 1e7f5225-08ee-42d3-ba5d-40c999308669
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: r
+  verbose_name: "Corr\xE9lation (r)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: relation
+  verbose_name: Relation
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: city
+  verbose_name: Ville
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 18212977-06e9-4a8c-b8e0-2703db8e347e

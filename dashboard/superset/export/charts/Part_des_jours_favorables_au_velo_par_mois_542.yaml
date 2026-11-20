@@ -1,0 +1,46 @@
+slice_name: "Part des jours favorables au v\xE9lo, par mois"
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_bar
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_bar
+  datasource: 15__table
+  x_axis: timestamp
+  metrics:
+  - expressionType: SQL
+    sqlExpression: AVG(CASE WHEN conditions_velo = 'Favorable' THEN 1.0 ELSE 0 END)
+    label: Jours favorables
+    optionName: metric_6bd29a85
+  groupby:
+  - city
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .0%
+  y_axis_title: ''
+  order_desc: true
+  time_grain_sqla: P1M
+query_context: null
+cache_timeout: null
+uuid: ed54bf9b-b88e-4156-b2ce-99846b1b80ae
+version: 1.0.0
+dataset_uuid: babdd260-6427-476f-923b-93040c09a4f5

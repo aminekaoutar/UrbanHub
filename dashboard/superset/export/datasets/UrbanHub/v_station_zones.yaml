@@ -1,0 +1,156 @@
+table_name: v_station_zones
+main_dttm_col: null
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: 600
+catalog: urbanhub
+schema: public
+sql: "SELECT city,\n       round(latitude::numeric, 2)::float AS lat_zone, round(longitude::numeric,\
+  \ 2)::float AS lon_zone,\n       city || ' ' || round(latitude::numeric, 2) || '\
+  \ / ' || round(longitude::numeric, 2) AS zone,\n       count(*) AS nb_stations,\
+  \ sum(capacity) AS capacity, sum(usage_per_day) AS usage_per_day,\n       sum(usage_per_day)\
+  \ / NULLIF(sum(capacity), 0) AS rotation,\n       avg(pct_empty) AS pct_empty, avg(pct_full)\
+  \ AS pct_full\nFROM station_profile WHERE nb_hours >= 720 AND capacity > 0\nGROUP\
+  \ BY 1, 2, 3, 4"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: e7f2e56e-c3fc-415f-8e62-477b3e49a7b7
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: rotation
+  verbose_name: Rotation (mouvements / place / jour)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pct_empty
+  verbose_name: Part du temps vide
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pct_full
+  verbose_name: Part du temps pleine
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: zone
+  verbose_name: Zone (~1 km)
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: usage_per_day
+  verbose_name: Mouvements / jour
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: capacity
+  verbose_name: "Capacit\xE9"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: nb_stations
+  verbose_name: Stations
+  is_dttm: false
+  is_active: true
+  type: LONGINTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: city
+  verbose_name: Ville
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: lat_zone
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: lon_zone
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 18212977-06e9-4a8c-b8e0-2703db8e347e

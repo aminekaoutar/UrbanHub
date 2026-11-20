@@ -1,0 +1,45 @@
+slice_name: Profil des stations par ville
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_bar
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_bar
+  datasource: 17__table
+  x_axis: city
+  metrics:
+  - expressionType: SQL
+    sqlExpression: COUNT(*)
+    label: Stations
+    optionName: metric_167445f3
+  groupby:
+  - profil
+  adhoc_filters: []
+  y_axis_format: .0%
+  y_axis_title: ''
+  order_desc: true
+  x_axis_sort_asc: true
+  xAxisLabelRotation: 30
+  xAxisLabelInterval: 0
+  stack: Stack
+  contributionMode: row
+query_context: null
+cache_timeout: null
+uuid: 603a99d2-ce58-466f-b48e-bde32fbc0a88
+version: 1.0.0
+dataset_uuid: 7c619e44-bfa1-4352-b9d8-b83e9439381e

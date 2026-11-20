@@ -1,0 +1,39 @@
+slice_name: "Fra\xEEcheur des donn\xE9es : derni\xE8re heure re\xE7ue par source et\
+  \ par ville (UTC)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  color_scheme: supersetColors
+  row_limit: 20
+  viz_type: table
+  datasource: 6__table
+  query_mode: raw
+  all_columns:
+  - source
+  - city
+  - derniere_heure
+  - premiere_heure
+  - nb_lignes
+  - table_name
+  order_by_cols:
+  - '["source", true]'
+  server_page_length: 10
+  adhoc_filters:
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: source IS NOT NULL
+  table_timestamp_format: '%d/%m/%Y %H:%M'
+  include_search: false
+  show_cell_bars: false
+  page_length: 0
+  align_pn: false
+  color_pn: false
+  allow_rearrange_columns: true
+  column_config: {}
+query_context: null
+cache_timeout: null
+uuid: c3b794ae-dad1-44a1-81a5-b63cd27633b0
+version: 1.0.0
+dataset_uuid: 883c7b27-cb61-4d79-97c5-ece38328111d

@@ -1,0 +1,45 @@
+slice_name: Les 10 jours les plus froids
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  color_scheme: supersetColors
+  row_limit: 10
+  viz_type: table
+  datasource: 9__table
+  query_mode: raw
+  all_columns:
+  - timestamp
+  - city
+  - tmin
+  - tmean
+  order_by_cols:
+  - '["tmin", true]'
+  server_page_length: 10
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: tmin IS NOT NULL
+  table_timestamp_format: '%d/%m/%Y'
+  include_search: false
+  show_cell_bars: false
+  page_length: 0
+  align_pn: false
+  color_pn: false
+  allow_rearrange_columns: true
+  column_config:
+    tmin:
+      d3NumberFormat: .1f
+    tmean:
+      d3NumberFormat: .1f
+query_context: null
+cache_timeout: null
+uuid: b49a3a76-ed70-49d0-863a-5287ec1a41c8
+version: 1.0.0
+dataset_uuid: 076d285d-e58b-4a87-bd45-65550f69482d

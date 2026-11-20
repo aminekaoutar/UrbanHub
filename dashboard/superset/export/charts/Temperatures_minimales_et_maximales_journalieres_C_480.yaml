@@ -1,0 +1,49 @@
+slice_name: "Temp\xE9ratures minimales et maximales journali\xE8res (\xB0C)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_line
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_line
+  datasource: 9__table
+  x_axis: timestamp
+  metrics:
+  - expressionType: SQL
+    sqlExpression: AVG(tmax)
+    label: "Max (\xB0C)"
+    optionName: metric_e2c06fa8
+  - expressionType: SQL
+    sqlExpression: AVG(tmin)
+    label: "Min (\xB0C)"
+    optionName: metric_6207b12a
+  groupby: []
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .1f
+  y_axis_title: "\xB0C"
+  order_desc: true
+  time_grain_sqla: P1W
+query_context: null
+cache_timeout: null
+uuid: 0e1a3f47-21f9-4229-ba31-fb876a71f9b9
+version: 1.0.0
+dataset_uuid: 076d285d-e58b-4a87-bd45-65550f69482d

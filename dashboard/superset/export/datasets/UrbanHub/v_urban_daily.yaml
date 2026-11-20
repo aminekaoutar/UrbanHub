@@ -1,0 +1,308 @@
+table_name: v_urban_daily
+main_dttm_col: timestamp
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: 600
+catalog: urbanhub
+schema: public
+sql: "SELECT d.*,\n       CASE WHEN d.temperature IS NULL THEN NULL\n         WHEN\
+  \ d.temperature < 0 THEN '1 \xB7 < 0 \xB0C'      WHEN d.temperature < 5 THEN '2\
+  \ \xB7 0-5 \xB0C'\n         WHEN d.temperature < 10 THEN '3 \xB7 5-10 \xB0C'   \
+  \ WHEN d.temperature < 15 THEN '4 \xB7 10-15 \xB0C'\n         WHEN d.temperature\
+  \ < 20 THEN '5 \xB7 15-20 \xB0C'   WHEN d.temperature < 25 THEN '6 \xB7 20-25 \xB0\
+  C'\n         WHEN d.temperature < 30 THEN '7 \xB7 25-30 \xB0C'   ELSE '8 \xB7 \u2265\
+  \ 30 \xB0C' END AS classe_temperature,\n       CASE WHEN d.precipitation IS NULL\
+  \ THEN NULL WHEN d.precipitation < 0.5 THEN '0 \xB7 Sec (< 0,5 mm)'\n         WHEN\
+  \ d.precipitation < 5 THEN '1 \xB7 Faible (0,5-5 mm)' WHEN d.precipitation < 15\
+  \ THEN '2 \xB7 Mod\xE9r\xE9e (5-15 mm)'\n         ELSE '3 \xB7 Forte (\u2265 15\
+  \ mm)' END AS pluie,\n       CASE WHEN d.wind_speed IS NULL THEN NULL WHEN d.wind_speed\
+  \ < 2 THEN '1 \xB7 Calme (< 2 m/s)'\n         WHEN d.wind_speed < 4 THEN '2 \xB7\
+  \ Faible (2-4 m/s)' WHEN d.wind_speed < 6 THEN '3 \xB7 Mod\xE9r\xE9 (4-6 m/s)'\n\
+  \         WHEN d.wind_speed < 9 THEN '4 \xB7 Soutenu (6-9 m/s)' ELSE '5 \xB7 Fort\
+  \ (\u2265 9 m/s)' END AS vent,\n       CASE WHEN d.temperature BETWEEN 12 AND 25\
+  \ AND d.precipitation < 1 AND d.wind_speed < 6\n                 AND coalesce(d.pm25,\
+  \ 0) <= 15 THEN 'Favorable'\n            ELSE 'D\xE9favorable' END AS conditions_velo\n\
+  FROM (\nSELECT city, date_trunc('day', local) AS timestamp,\n       avg(temperature)\
+  \ AS temperature, max(temperature) AS tmax, min(temperature) AS tmin,\n       sum(precipitation)\
+  \ AS precipitation, avg(wind_speed) AS wind_speed,\n       avg(usage_events) AS\
+  \ usage_per_hour, avg(usage_events::float / NULLIF(nb_bike_stations, 0)) AS usage_per_station,\n\
+  \       avg(occupancy_rate) AS occupancy_rate,\n       avg(bikes_available) AS bikes_available,\n\
+  \       avg(pm25) AS pm25, avg(pm10) AS pm10, avg(no2) AS no2, avg(o3) AS o3,\n\
+  \       count(usage_events) AS bike_hours,\n       CASE WHEN extract(isodow FROM\
+  \ date_trunc('day', local)) >= 6 THEN 'Week-end' ELSE 'Semaine' END AS type_jour\n\
+  FROM (SELECT *, ((timestamp AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Paris') AS\
+  \ local FROM urban_city_hourly) u\nGROUP BY 1, 2\n) d"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: babdd260-6427-476f-923b-93040c09a4f5
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: usage_per_station
+  verbose_name: Mouvements / station / h
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: tmax
+  verbose_name: "Temp. max (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: tmin
+  verbose_name: "Temp. min (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: usage_per_hour
+  verbose_name: Mouvements / heure
+  is_dttm: false
+  is_active: true
+  type: DECIMAL
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: occupancy_rate
+  verbose_name: Taux de remplissage
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: type_jour
+  verbose_name: Type de jour
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pm25
+  verbose_name: "PM2.5 (\xB5g/m\xB3)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pm10
+  verbose_name: "PM10 (\xB5g/m\xB3)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: no2
+  verbose_name: "NO2 (\xB5g/m\xB3)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: o3
+  verbose_name: "O3 (\xB5g/m\xB3)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: wind_speed
+  verbose_name: Vent (m/s)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: temperature
+  verbose_name: "Temp\xE9rature (\xB0C)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: precipitation
+  verbose_name: Pluie (mm)
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: bikes_available
+  verbose_name: "V\xE9los disponibles"
+  is_dttm: false
+  is_active: true
+  type: DECIMAL
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: conditions_velo
+  verbose_name: "Conditions v\xE9lo"
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: timestamp
+  verbose_name: Date
+  is_dttm: true
+  is_active: true
+  type: DATETIME
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pluie
+  verbose_name: Pluie
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: classe_temperature
+  verbose_name: "Temp\xE9rature"
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: city
+  verbose_name: Ville
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: vent
+  verbose_name: Vent
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: bike_hours
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: LONGINTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 18212977-06e9-4a8c-b8e0-2703db8e347e

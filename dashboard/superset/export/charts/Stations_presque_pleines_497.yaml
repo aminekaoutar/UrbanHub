@@ -1,0 +1,30 @@
+slice_name: Stations presque pleines
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 10__table
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(pct_full)
+    label: pleines
+    optionName: metric_58331fe7
+  subheader: des stations en moyenne (> 90 %)
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: .1%
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: d1f08699-bb4a-46a7-a989-ac8c48748fb3
+version: 1.0.0
+dataset_uuid: 163ed8ef-3221-4c8d-b241-932f01318927

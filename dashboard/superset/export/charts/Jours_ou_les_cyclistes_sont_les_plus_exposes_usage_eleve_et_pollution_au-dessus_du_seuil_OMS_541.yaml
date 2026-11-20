@@ -1,0 +1,58 @@
+slice_name: "Jours o\xF9 les cyclistes sont les plus expos\xE9s (usage \xE9lev\xE9\
+  \ et pollution au-dessus du seuil OMS)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  color_scheme: supersetColors
+  row_limit: 30
+  viz_type: table
+  datasource: 15__table
+  query_mode: raw
+  all_columns:
+  - timestamp
+  - city
+  - usage_per_hour
+  - pm25
+  - no2
+  - temperature
+  - precipitation
+  order_by_cols:
+  - '["pm25", false]'
+  server_page_length: 10
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: pm25 > 15 AND usage_per_hour IS NOT NULL
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: pm25 IS NOT NULL
+  table_timestamp_format: '%d/%m/%Y'
+  include_search: false
+  show_cell_bars: false
+  page_length: 0
+  align_pn: false
+  color_pn: false
+  allow_rearrange_columns: true
+  column_config:
+    usage_per_hour:
+      d3NumberFormat: ',.0f'
+    pm25:
+      d3NumberFormat: .1f
+    no2:
+      d3NumberFormat: .1f
+    temperature:
+      d3NumberFormat: .1f
+    precipitation:
+      d3NumberFormat: .1f
+query_context: null
+cache_timeout: null
+uuid: c942f7bc-f364-40f9-82ee-c202a9d81d57
+version: 1.0.0
+dataset_uuid: babdd260-6427-476f-923b-93040c09a4f5

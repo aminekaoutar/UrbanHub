@@ -1,0 +1,38 @@
+slice_name: "NO2 (\xB5g/m\xB3) \xB7 seuil OMS 25"
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number
+  datasource: 2__table
+  x_axis: timestamp
+  time_grain_sqla: PT1H
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(no2)
+    label: "NO2 (\xB5g/m\xB3)"
+    optionName: metric_7086b2ea
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: 'DATEADD(DATETIME("now"), -7, day) : now'
+    expressionType: SIMPLE
+  show_trend_line: true
+  start_y_axis_at_zero: false
+  y_axis_format: .1f
+  compare_lag: 24
+  compare_suffix: vs il y a 24 h
+  show_timestamp: true
+  time_format: smart_date
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+  rolling_type: None
+query_context: null
+cache_timeout: null
+uuid: 266d4074-22a6-4f72-8782-79ec57b950f5
+version: 1.0.0
+dataset_uuid: 5f43325e-abae-4da5-a3d5-cbcb81f9c37c

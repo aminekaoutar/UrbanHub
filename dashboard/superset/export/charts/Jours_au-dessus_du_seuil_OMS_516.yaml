@@ -1,0 +1,30 @@
+slice_name: Jours au-dessus du seuil OMS
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 13__table
+  metric:
+    expressionType: SQL
+    sqlExpression: SUM(depassement)
+    label: jours
+    optionName: metric_8606743f
+  subheader: "jours \xD7 villes"
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  y_axis_format: ',d'
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: 44e90a26-59e2-4e4f-9742-638a01af9c0e
+version: 1.0.0
+dataset_uuid: 73c5f9f2-cb32-4875-8032-7801bae0a4a0

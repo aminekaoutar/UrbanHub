@@ -1,0 +1,36 @@
+slice_name: Usage les autres jours
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number_total
+  datasource: 15__table
+  metric:
+    expressionType: SQL
+    sqlExpression: AVG(usage_per_station)
+    label: mouvements / station / h
+    optionName: metric_d585f9e3
+  subheader: mouvements par station et par heure
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: "conditions_velo = 'D\xE9favorable'"
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: usage_per_hour IS NOT NULL
+  y_axis_format: .2f
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+query_context: null
+cache_timeout: null
+uuid: 4fbd4832-912c-4c2c-83c0-3021ebc878b6
+version: 1.0.0
+dataset_uuid: babdd260-6427-476f-923b-93040c09a4f5

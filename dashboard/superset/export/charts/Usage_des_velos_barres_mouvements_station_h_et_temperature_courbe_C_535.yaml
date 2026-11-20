@@ -1,0 +1,59 @@
+slice_name: "Usage des v\xE9los (barres, mouvements / station / h) et temp\xE9rature\
+  \ (courbe, \xB0C)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: mixed_timeseries
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: mixed_timeseries
+  datasource: 15__table
+  x_axis: timestamp
+  time_grain_sqla: P1W
+  metrics:
+  - expressionType: SQL
+    sqlExpression: AVG(usage_per_station)
+    label: Mouvements / station / h
+    optionName: metric_e99e04e7
+  groupby: []
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  metrics_b:
+  - expressionType: SQL
+    sqlExpression: AVG(temperature)
+    label: "Temp\xE9rature (\xB0C)"
+    optionName: metric_1935fd87
+  groupby_b: []
+  adhoc_filters_b:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  seriesType: bar
+  seriesTypeB: line
+  yAxisIndex: 0
+  yAxisIndexB: 1
+  show_legend: true
+  legendOrientation: top
+  rich_tooltip: true
+  zoomable: false
+  y_axis_format: .2f
+  y_axis_format_secondary: .1f
+  row_limit_b: 50000
+  order_desc: true
+  order_desc_b: true
+  x_axis_time_format: smart_date
+  tooltipTimeFormat: smart_date
+  markerEnabled: false
+  markerEnabledB: false
+query_context: null
+cache_timeout: null
+uuid: d2da6079-31b8-433e-b52c-62dbc5003922
+version: 1.0.0
+dataset_uuid: babdd260-6427-476f-923b-93040c09a4f5

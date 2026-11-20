@@ -1,0 +1,157 @@
+table_name: v_pollution_daily
+main_dttm_col: timestamp
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: 600
+catalog: urbanhub
+schema: public
+sql: "SELECT city, date_trunc('day', ((timestamp AT TIME ZONE 'UTC') AT TIME ZONE\
+  \ 'Europe/Paris')) AS timestamp,\n       pollutant, avg(value) AS moyenne, max(value)\
+  \ AS pic, max(seuil) AS seuil,\n       avg(value) / max(seuil) AS indice, (avg(value)\
+  \ > max(seuil))::int AS depassement, count(*) AS nb_hours\nFROM (\nSELECT p.city,\
+  \ p.timestamp, v.pollutant, v.value, s.seuil, v.value / s.seuil AS indice,\n   \
+  \    \n    to_char(local, 'HH24') || 'h' AS heure,\n    extract(hour FROM local)::int\
+  \ AS hour_local,\n    extract(isodow FROM local)::int || ' \xB7 ' ||\n        (ARRAY['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'])[extract(isodow\
+  \ FROM local)::int] AS jour,\n    CASE WHEN extract(isodow FROM local) >= 6 THEN\
+  \ 'Week-end' ELSE 'Semaine' END AS type_jour,\n    to_char(local, 'MM') || ' \xB7\
+  \ ' ||\n        (ARRAY['Janv.','F\xE9vr.','Mars','Avr.','Mai','Juin','Juil.','Ao\xFB\
+  t','Sept.','Oct.','Nov.','D\xE9c.'])[extract(month FROM local)::int] AS mois,\n\
+  \    CASE WHEN extract(month FROM local) IN (12, 1, 2) THEN '1 \xB7 Hiver'\n   \
+  \      WHEN extract(month FROM local) IN (3, 4, 5) THEN '2 \xB7 Printemps'\n   \
+  \      WHEN extract(month FROM local) IN (6, 7, 8) THEN '3 \xB7 \xC9t\xE9'\n   \
+  \      ELSE '4 \xB7 Automne' END AS saison\nFROM (SELECT *, ((timestamp AT TIME\
+  \ ZONE 'UTC') AT TIME ZONE 'Europe/Paris') AS local FROM pollution_city_hourly)\
+  \ p\nCROSS JOIN LATERAL (VALUES ('PM2.5', p.pm25), ('PM10', p.pm10), ('NO2', p.no2),\
+  \ ('O3', p.o3), ('CO', p.co))\n     AS v(pollutant, value)\nJOIN (VALUES ('PM2.5',\
+  \ 15.0), ('PM10', 45.0), ('NO2', 25.0), ('O3', 100.0), ('CO', 4000.0)) AS s(pollutant,\
+  \ seuil) USING (pollutant)\nWHERE v.value IS NOT NULL\n) l\nGROUP BY 1, 2, 3"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 73c5f9f2-cb32-4875-8032-7801bae0a4a0
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: moyenne
+  verbose_name: "Moyenne du jour (\xB5g/m\xB3)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: indice
+  verbose_name: Concentration / seuil OMS
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: seuil
+  verbose_name: "Seuil OMS (\xB5g/m\xB3)"
+  is_dttm: false
+  is_active: true
+  type: DECIMAL
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pic
+  verbose_name: "Pic horaire (\xB5g/m\xB3)"
+  is_dttm: false
+  is_active: true
+  type: FLOAT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: timestamp
+  verbose_name: Date
+  is_dttm: true
+  is_active: true
+  type: DATETIME
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: pollutant
+  verbose_name: Polluant
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: city
+  verbose_name: Ville
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: nb_hours
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: LONGINTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: depassement
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: ''
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 18212977-06e9-4a8c-b8e0-2703db8e347e

@@ -1,0 +1,42 @@
+slice_name: Rotation moyenne par ville (mouvements par place et par jour)
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_timeseries_bar
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  rich_tooltip: true
+  tooltipTimeFormat: smart_date
+  x_axis_time_format: smart_date
+  truncateYAxis: false
+  y_axis_title_margin: 40
+  y_axis_title_position: Left
+  zoomable: false
+  markerEnabled: false
+  sort_series_type: name
+  sort_series_ascending: true
+  viz_type: echarts_timeseries_bar
+  datasource: 11__table
+  x_axis: city
+  metrics:
+  - expressionType: SQL
+    sqlExpression: SUM(usage_per_day) / NULLIF(SUM(capacity), 0)
+    label: Rotation
+    optionName: metric_dade34b9
+  groupby: []
+  adhoc_filters: []
+  y_axis_format: .1f
+  y_axis_title: ''
+  order_desc: true
+  x_axis_sort_asc: true
+  xAxisLabelRotation: 30
+  xAxisLabelInterval: 0
+query_context: null
+cache_timeout: null
+uuid: 4193a189-e235-4b4b-840e-b30e643e4327
+version: 1.0.0
+dataset_uuid: e7f2e56e-c3fc-415f-8e62-477b3e49a7b7

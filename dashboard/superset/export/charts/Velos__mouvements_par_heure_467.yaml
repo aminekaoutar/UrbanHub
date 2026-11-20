@@ -1,0 +1,38 @@
+slice_name: "V\xE9los : mouvements par heure"
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number
+params:
+  color_scheme: supersetColors
+  row_limit: 50000
+  viz_type: big_number
+  datasource: 3__table
+  x_axis: timestamp
+  time_grain_sqla: PT1H
+  metric:
+    expressionType: SQL
+    sqlExpression: SUM(usage_events)
+    label: Mouvements / heure
+    optionName: metric_2d3b91cd
+  adhoc_filters:
+  - clause: WHERE
+    subject: timestamp
+    operator: TEMPORAL_RANGE
+    comparator: 'DATEADD(DATETIME("now"), -7, day) : now'
+    expressionType: SIMPLE
+  show_trend_line: true
+  start_y_axis_at_zero: false
+  y_axis_format: ',.0f'
+  compare_lag: 24
+  compare_suffix: vs il y a 24 h
+  show_timestamp: true
+  time_format: smart_date
+  header_font_size: 0.35
+  subheader_font_size: 0.13
+  rolling_type: None
+query_context: null
+cache_timeout: null
+uuid: 7cc48eb3-7813-45cd-8e93-62e4d9c96cac
+version: 1.0.0
+dataset_uuid: dee1c5ff-5ea4-44ab-b9cf-c6a61ac05a1c

@@ -1,0 +1,60 @@
+slice_name: "Stations critiques \xE0 r\xE9\xE9quilibrer (souvent vides ou pleines)"
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  color_scheme: supersetColors
+  row_limit: 15
+  viz_type: table
+  datasource: 5__table
+  query_mode: aggregate
+  groupby:
+  - station_name
+  - city
+  metrics:
+  - expressionType: SQL
+    sqlExpression: AVG(pct_empty) + AVG(pct_full)
+    label: Vide ou pleine
+    optionName: metric_4840f635
+  - expressionType: SQL
+    sqlExpression: AVG(pct_empty)
+    label: Vide
+    optionName: metric_4deb8906
+  - expressionType: SQL
+    sqlExpression: AVG(pct_full)
+    label: Pleine
+    optionName: metric_914edee1
+  - expressionType: SQL
+    sqlExpression: AVG(usage_per_day)
+    label: Mouvements / jour
+    optionName: metric_115747a1
+  timeseries_limit_metric:
+    expressionType: SQL
+    sqlExpression: AVG(pct_empty) + AVG(pct_full)
+    label: Vide ou pleine
+    optionName: metric_9a1c1583
+  order_desc: true
+  adhoc_filters:
+  - clause: WHERE
+    expressionType: SQL
+    sqlExpression: nb_hours >= 720 AND capacity > 0 AND usage_per_day >= 5 AND pct_empty
+      IS NOT NULL AND pct_full IS NOT NULL
+  include_search: false
+  show_cell_bars: true
+  page_length: 0
+  table_timestamp_format: '%d/%m/%Y'
+  column_config:
+    Vide ou pleine:
+      d3NumberFormat: .0%
+    Vide:
+      d3NumberFormat: .0%
+    Pleine:
+      d3NumberFormat: .0%
+    Mouvements / jour:
+      d3NumberFormat: ',.0f'
+query_context: null
+cache_timeout: null
+uuid: e4d5f412-8be3-4a47-b51f-751066130ccb
+version: 1.0.0
+dataset_uuid: c1f58bff-1603-4388-8537-67883cda6289
