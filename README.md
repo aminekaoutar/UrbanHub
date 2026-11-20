@@ -49,6 +49,11 @@ Prérequis : Git, Docker Desktop (démarré), environ 10 Go libres pour les imag
 - Les **collecteurs** (simples appels d'API) peuvent tourner sur le PC avec le Python local ;
   ils joignent MinIO sur `http://localhost:9000`.
 
+## Avancement
+
+- **Développeur 2 (CityBikes)** : collecteur, clean, curated, notebook Partie 2 → [`docs/dev2_citybikes.md`](docs/dev2_citybikes.md)
+- **Site web interactif** (tous) : `.venv/bin/python -m dashboard.webapp` puis http://127.0.0.1:8000 → [`dashboard/webapp/README.md`](dashboard/webapp/README.md)
+
 ## Collecte en continu (machine de démo)
 
 Sur la machine qui sert à la démo, deux services de plus tournent en continu et redémarrent seuls
